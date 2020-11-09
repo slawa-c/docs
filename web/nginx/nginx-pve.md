@@ -15,7 +15,7 @@ vim /etc/nginx/conf.d/proxmox.conf
 ```
 ```
 upstream proxmox {
-    server "FQDN HOSTNAME";
+    server "pve.local"; ##"FQDN HOSTNAME"
 }
  
 server {
