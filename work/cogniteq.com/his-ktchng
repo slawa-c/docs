@@ -1,0 +1,45 @@
+root@Ktchng:~# history
+
+    1  apt update -y
+    2  apt upgrade -y
+    3  vi /etc/ssh/sshd_config
+    4  reboot
+    5  w
+    6  apt install php-gd
+    7  apt install libgd-tools
+    8  apt install libgd-dev
+    9  apt install php-gd
+   10  apt install libgd-dev
+   11  apt update -y
+   12  apt install php-gd -y
+   13  apt install -f libgd-dev
+   14  php -v
+   15  apt install php72-gd -y
+   16  apt install php7-gd -y
+   17  apt search php-gd
+   18  apt-get install libgd-dev
+   19  apt install curl php-cli php-mbstring git unzip
+   
+   21  dpkg --configure -a
+   
+   23  dpkg --configure -a
+   24  mv /var/lib/dpkg/status-new /home/
+   25  dpkg --configure -a
+   26  apt-get install -f
+   27  apt-get update
+   28  apt-get upgrade
+   29  apt-get autoremove
+   30  dpkg --configure -a
+   31  cd /
+   32  cd /var/lib/dpkg/
+   33  ls -la
+   34  w
+   
+   36  apt update
+   39  adduser cogniteq
+   40  usermod -aG sudo cogniteq
+   41  sudo - cogniteq
+    
+   44  /usr/pgadmin4/bin/setup-web.sh
+   
+   
