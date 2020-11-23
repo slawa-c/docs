@@ -1,0 +1,29 @@
+Troubleshooting
+
+
+https://drupal-admin.ru/blog/%D1%83%D0%B2%D0%B5%D0%BB%D0%B8%D1%87%D0%B5%D0%BD%D0%B8%D0%B5-%D0%BC%D0%B0%D0%BA%D1%81%D0%B8%D0%BC%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B3%D0%BE-%D1%80%D0%B0%D0%B7%D0%BC%D0%B5%D1%80%D0%B0-%D0%B7%D0%B0%D0%B3%D1%80%D1%83%D0%B6%D0%B0%D0%B5%D0%BC%D1%8B%D1%85-%D1%84%D0%B0%D0%B9%D0%BB%D0%BE%D0%B2-%D0%B2-php-%D0%B8-nginx-upload-max-filesize-%D0%B4%D0%BB%D1%8F
+
+Увеличение максимального размера загружаемых файлов в PHP и Nginx (upload max filesize) для Drupal и не только.
+Опубликовано admin - вс, 04/21/2013 - 07:09
+
+Уже все наверное сталкивались с задачей увеличения максимального размера загружаемого файла. В этой заметке я напишу что для этого нужно сделать если у Вас стоит Nginx как фронтенд к Apache или к php-fpm. Ну если нет Nginx, то достаточно изменить переменные конфиге php.
+
+Итак для увеличения максимального размера загружаемого файла сначала необходимо увеличить значение переменных PHP upload_max_filesize и post_max_size в файле /etc/php5/apache2/php.ini, например:
+
+; Максимально разрешенный размер для загружаемых файлов.
+; http://php.net/upload-max-filesize
+upload_max_filesize = 30M
+
+; Максимальный размер POST запросов, которые PHP будет обрабатывать.
+; http://php.net/post-max-size
+post_max_size = 30M
+
+Этого уже достаточно, если у Вас не установлен nginx, ну а если установлен, то далее в конфигурационном файле nginx /etc/nginx/nginx.conf увеличить значение переменной client_max_body_size, например:
+
+http {
+	#...
+        client_max_body_size 30m;
+	#...
+}
+
+
