@@ -23,7 +23,7 @@ make
 make install
 
 #copy/download/curl/wget the init script
-sudo wget https://raw.githubusercontent.com/JasonGiedymin/nginx-init-ubuntu/master/nginx -O /etc/init.d/nginx
+sudo wget https://raw.githubusercontent.com/vitovts/ws/main/web/nginx/nginx -O /etc/init.d/nginx
 sudo chmod +x /etc/init.d/nginx
 
 service nginx status  # to poll for current status
