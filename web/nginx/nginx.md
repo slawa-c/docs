@@ -5,6 +5,7 @@
 NGINX 
 
 Install
+```
 apt install nginx
 apt install build-essential
 wget http://nginx.org/download/nginx-1.19.5.tar.gz
@@ -14,7 +15,7 @@ cd nginx
 ./configure --sbin-path=/usr/bin/nginx --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --with-debug --with-pcre --with-http_ssl_module
 make
 make install
-
+```
 
 
 Это: 
@@ -25,9 +26,11 @@ make install
 
 
 Отдать код ответа
+```
 if ($http_user_agent ~ (Ahrefs|MJ12bot|LinkpadBot|MauiBot)) {
         return;
  }
+ ```
  
 Редирект
 301 перманентный - статический (постоянный) 
@@ -41,11 +44,15 @@ if ($http_user_agent ~ (Ahrefs|MJ12bot|LinkpadBot|MauiBot)) {
 
 Дерективы:
 - Простая
+```
 access_log /var/log/nginx/access.log main;
+```
 - Блочная 
+```
 events {
   worker_connections 1024;
 }
+```
 
 -- контенст
 - main
