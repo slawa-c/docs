@@ -2,17 +2,21 @@
 
 [Содержание](../readme.md)
 
-NGINX 
 
+
+```URL
 http://nginx.org/ru/docs/ngx_core_module.html
 http://nginx.org/ru/docs/configure.html
-
+https://www.leaderssl.ru/articles/131-ustanovka-sertifikata-nginx
+```
 
 
 Install
 ```
 apt install nginx
-&&
+```
+
+```
 apt install build-essential
 wget http://nginx.org/download/nginx-1.19.5.tar.gz
 tar -xvf 
@@ -23,8 +27,8 @@ make
 make install
 
 #copy/download/curl/wget the init script
-sudo wget https://raw.githubusercontent.com/vitovts/ws/main/web/nginx/nginx -O /etc/init.d/nginx
-sudo chmod +x /etc/init.d/nginx
+wget https://raw.githubusercontent.com/vitovts/ws/main/web/nginx/nginx -O /etc/init.d/nginx
+chmod +x /etc/init.d/nginx
 
 service nginx status  # to poll for current status
 service nginx stop    # to stop any servers if any
@@ -40,7 +44,7 @@ sudo update-rc.d -f nginx remove
 ----------------------------
 echo "NGINXPATH=/etc/nginx/nginx.conf" > /etc/default/nginx
 echo "DAEMON=/usr/bin/nginx" >> /etc/default/nginx
-
+vim /etc/default/nginx
 ```
 
 
