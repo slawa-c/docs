@@ -69,10 +69,11 @@ if ($http_user_agent ~ (Ahrefs|MJ12bot|LinkpadBot|MauiBot)) {
 проксировать запросы
 
 
-конфигкрация
+конфигурация
 /etc/nginx/nginx.conf
 
-Дерективы:
+
+Directives (Дерективы) :
 - Простая
 ```
 access_log /var/log/nginx/access.log main;
@@ -84,7 +85,8 @@ events {
 }
 ```
 
--- контенст
+Contexts (контенст)
+
 - main
 - events
 - location
@@ -99,6 +101,46 @@ HTTPS - надстройка над HTTP
 Ищит по всем контекстам сервера в значении listen (кто принимает запрос по этому ip:port)
 Host - сопаставляет с значением server_name (ищет самое верхнее полное савподение, если не нашел смотрит самое точное совпадение server_name 
 если не нашел - то выбирает дефолтовый - или указать явно default в директиве listen после ip:port
+
+
+
+
+Matching Order (Порядок совпадения):
+```
+1. = Exact Match (полное совпадение)
+2. ^~ Preferential Prefix (Префик преимущества)
+3. ~&*~ Regex Math (Регулярное выражение)
+4. no modifer (без модификатора) Prefix Match no modifier (Совпадение префикса (без модификатора))
+```
+
+Logging
+
+acceess_log off;
+error_log off;
+
+Директивы
+Наследование
+HTTP -> SERVER -> LOCATION
+
+Standard Directive (стандартные директивы)
+gzip on;
+
+Array Directive (директивы массивы)
+access/log logs/access.log
+access/log logs/access_notice.log notice;
+
+Action Directive (директивы действия)
+location /... {
+ rewrite ..
+ return ...
+}
+
+Dirctive try_files
+try_files $uri = 404;
+try_files $uri index.html = 404;
+
+
+
 
 
 
