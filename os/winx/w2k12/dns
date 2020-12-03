@@ -1,0 +1,28 @@
+Reverse Lookup Zones
+ New Zone
+  Primary zone (Store the zone AD (avaalable only if DNS server is a writeable domain controller)
+   To all DNS server running on domain controllers in this forest: grt.customs.gov.by
+    IPv4 Reverse Lookup Zone
+     10.16
+      Allow only secure dynamic updates (recommended for AD)
+     
+   
+Reverse Lookup Zones
+  16.10.in-addr.arpa
+   Name Server (NS)
+    Properties
+     Name Servers
+      Edit
+       Resolve
+        delete ::1
+        
+Forward Lookup Zones
+ grt.customs.gov.by
+  dc16 Host(A)
+   Properties
+    Update associated pointer (PTR) record
+    
+DC16
+ Launch nslookup
+  Default Server: dc16.grt.customs.gov.by
+  Address: 10.16.3.2
