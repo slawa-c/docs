@@ -78,6 +78,10 @@ server {
            }
 }
 
+# vim /etc/php/7.2/fpm/pool.d/www.conf 
+;listen = /run/php/php7.2-fpm.sock
+listen = 127.0.0.1:9000
+
 
 
 # nginx -t
