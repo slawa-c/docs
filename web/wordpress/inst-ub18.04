@@ -1,0 +1,109 @@
+Wordpress install Ubiuntu 18.04
+
+# apt-get update 
+# apt-get upgrade
+
+
+# lsb_release -a
+
+# apt-get install nginx
+
+# apt-get install mariadb-server 
+# systemctl enable mariadb.service
+# mysql_secure_installation
+
+# mysql -u root -p
+MariaDB [(none)]> use mysql;
+MariaDB [mysql]> update user SET PASSWORD=PASSWORD("Passw0rd!") WHERE USER='root';
+
+
+# apt-get install php7.2 php7.2-cli php7.2-fpm php7.2-mysql php7.2-json php7.2-opcache php7.2-mbstring php7.2-xml php7.2-gd php7.2-curl
+
+# mysql -u root -p
+Enter password:
+
+MariaDB [mysql]> CREATE DATABASE wordpress_db;
+Query OK, 1 row affected (0.00 sec)
+
+MariaDB [mysql]> GRANT ALL ON wordpress_db.* TO 'wpuser'@'localhost' IDENTIFIED BY 'Passw0rd!' WITH GRANT OPTION;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [mysql]> FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [mysql]> exit
+
+# mkdir -p /sites/wordpress
+
+#vim /etc/nginx/conf.d/wordpress.conf
+# cd /etc/nginx/sites-available
+# cat wordpress.conf
+server {
+            listen 80;
+            root /var/www/html/wordpress/public_html;
+            index index.php index.html;
+            server_name wordpress.ws;
+
+	    access_log /var/log/nginx/wordpress.ws.access.log;
+    	    error_log /var/log/nginx/wordpress.ws.error.log;
+
+            location / {
+                         try_files $uri $uri/ =404;
+            }
+
+            location ~ \.php$ {
+                         include snippets/fastcgi-php.conf;
+                         #fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+                         fastcgi_pass 127.0.0.1:9000;
+            }
+            
+            location ~ /\.ht {
+                         deny all;
+            }
+
+            location = /favicon.ico {
+                         log_not_found off;
+                         access_log off;
+            }
+
+            location = /robots.txt {
+                         allow all;
+                         log_not_found off;
+                         access_log off;
+           }
+       
+            location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+                         expires max;
+                         log_not_found off;
+           }
+}
+
+
+
+# nginx -t
+
+# systemctl reload nginx
+# systemctl reload php7.0-fpm
+
+
+# wget https://wordpress.org/latest.tar.gz
+
+# chown -R www-data:www-data /sites/*
+# chmod -R 755 * /sites/*
+
+
+
+# cd /sites/wordpress
+# mv wp-config-sample.php wp-config.php
+# vi wp-config.php
+ ...
+ ...
+ define('DB_NAME', 'wordpress_db');
+ define('DB_USER', 'ws);
+ define('DB_PASSWORD', 'Passw0rd!');
+ ...
+ ...
+
+
+
+
