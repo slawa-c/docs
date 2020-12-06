@@ -2,8 +2,34 @@ Ubuntu 18.04.5 LTS
 
 # apt update -y
 # apt upgrade -y
+
 # apt install mc vim nginx
 # apt remove nginx
+
+```
+# wget https://raw.githubusercontent.com/vitovts/ws/main/web/nginx/nginx -O /etc/init.d/nginx
+# chmod +x /etc/init.d/nginx
+
+#[optional] 
+#sudo update-rc.d -f nginx defaults
+
+service nginx status  # to poll for current status
+service nginx stop    # to stop any servers if any
+service nginx start   # to start the server
+
+#[optional remove the upstart script]
+sudo update-rc.d -f nginx remove
+```
+
+```
+echo "NGINXPATH=/etc/nginx/nginx.conf" > /etc/default/nginx
+echo "DAEMON=/usr/bin/nginx" >> /etc/default/nginx
+vim /etc/default/nginx
+```
+
+
+
+
 # wget https://wordpress.org/latest.tar.gz
 # wget http://nginx.org/download/nginx-1.19.5.tar.gz
 # wget http://nginx.org/download/nginx-1.18.0.tar.gz
