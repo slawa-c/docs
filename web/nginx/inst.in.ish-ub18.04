@@ -1,0 +1,134 @@
+Ubuntu 18.04.5 LTS
+
+# apt update -y
+# apt upgrade -y
+# apt install mc vim nginx
+# apt remove nginx
+# wget https://wordpress.org/latest.tar.gz
+# wget http://nginx.org/download/nginx-1.19.5.tar.gz
+# wget http://nginx.org/download/nginx-1.18.0.tar.gz
+# apt-get install libc6-dev libpcre3-dev libssl-dev zlib1g-dev
+
+## make
+# apt install build-essential
+
+## php-fpm
+# apt-get install php7.2 php7.2-cli php7.2-fpm php7.2-mysql php7.2-json php7.2-opcache php7.2-mbstring php7.2-xml php7.2-gd php7.2-curl
+
+## mysql
+# apt-get install mariadb-server 
+# systemctl enable mariadb.service
+# mysql_secure_installation
+# mysql -u root -p
+$ CREATE DATABASE wordpress_db; // Query OK, 1 row affected (0.00 sec)
+$ GRANT ALL ON wordpress_db.* TO 'wpuser'@'localhost' IDENTIFIED BY 'Passw0rd!' WITH GRANT OPTION; //Query OK, 0 rows affected (0.00 sec)
+$ FLUSH PRIVILEGES; // Query OK, 0 rows affected (0.00 sec)
+$ exit
+# mv /sites/wordpress/wp-config-sample.php /sites/wordpress/wp-config.php
+# vim /sites/wordpress/wp-config.php
+ ...
+ define('DB_NAME', 'wordpress_db');
+ define('DB_USER', 'ws);
+ define('DB_PASSWORD', 'Passw0rd!');
+ ...
+
+## access 
+# mldir /sites
+# chown -R www-data:www-data /sites/*
+# chmod -R 755 /sites/*
+
+
+
+
+# tar -xf nginx-1.18.0.tar.gz 
+# cd nginx-1.18.0/
+
+```
+# ./configure --sbin-path=/usr/local/sbin \
+              --conf-path=/etc/nginx/nginx.conf \
+              --error-log-path=/var/log/nginx/error.log \
+              --http-log-path=/var/log/nginx/access.log \
+              --lock-path=/var/lock/nginx.loc \
+              --pid-path=/run/nginx.pid \
+              --with-debug \
+              --modules-path=/usr/lib/nginx/modules \
+              --with-pcre \
+              --with-pcre-jit \
+              --with-http_ssl_module \
+              --with-http_stub_status_module \
+              --with-http_gzip_static_module \
+              --with-http_gunzip_module \
+              --with-http_v2_module \
+              --with-http_realip_module \
+              --with-http_addition_module \
+              --with-threads \
+              --user=www-data \
+              --group=www-data
+```
+```
+./configure --sbin-path=/usr/bin/nginx 
+--http-client-body-temp-path=/var/lib/nginx/body --http-fastcgi-temp-path=/var/lib/nginx/fastcgi --http-proxy-temp-path=/var/lib/nginx/proxy 
+--http-scgi-temp-path=/var/lib/nginx/scgi --http-uwsgi-temp-path=/var/lib/nginx/uwsgi   
+--with-http_stub_status_module  --with-http_auth_request_module  --with-http_dav_module  --with-http_slice_module  
+ --with-http_image_filter_module=dynamic --with-http_sub_module --with-http_xslt_module=dynamic --with-stream=dynamic 
+--with-stream_ssl_module --with-mail=dynamic --with-mail_ssl_module
+ --with-http_geoip_module=dynamic \
+```
+
+
+
+# vim /etc/nginx/sites-available/wordpress.conf
+server {
+          listen 80;
+          root /sites/wordpress;
+          index index.php index.html;
+          server_name wordpress.ws;
+
+	        access_log /var/log/nginx/wordpress.ws.access.log;
+    	    error_log /var/log/nginx/wordpress.ws.error.log;
+
+          location / {
+                         try_files $uri $uri/ =404;
+            }
+
+          location ~ \.php$ {
+                         include snippets/fastcgi-php.conf;
+                         #fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+                         fastcgi_pass 127.0.0.1:9000;
+            }
+            
+          location ~ /\.ht {
+                         deny all;
+            }
+
+          location = /favicon.ico {
+                         log_not_found off;
+                         access_log off;
+            }
+
+          location = /robots.txt {
+                         allow all;
+                         log_not_found off;
+                         access_log off;
+           }
+       
+          location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+                         expires max;
+                         log_not_found off;
+           }
+}
+
+
+# ln -s /etc/nginx/sites-available/wordpress.conf /etc/nginx/sites-enabled/
+
+# vim /etc/php/7.2/fpm/pool.d/www.conf 
+;listen = /run/php/php7.2-fpm.sock
+listen = 127.0.0.1:9000 
+
+
+service php7.2-fpm restart
+service nginx reload 
+
+
+
+
