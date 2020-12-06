@@ -2,6 +2,7 @@
 
 [Содержание](../readme.md)
 
+curl -I http://localhost
 
 
 ```URL
