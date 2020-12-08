@@ -62,7 +62,7 @@ $ exit
  ...
 
 ## access 
-# mldir /sites
+# mkdir /sites
 # chown -R www-data:www-data /sites/*
 # chmod -R 755 /sites/*
 
