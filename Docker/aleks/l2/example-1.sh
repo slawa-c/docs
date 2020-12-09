@@ -7,5 +7,5 @@ docker network rm frontend
 # Создаём сеть
 docker network create frontend
 
-# Получить список всех существующих сетей.
-docker network ls
+# #OR
+# docker network create -d bridge frontend

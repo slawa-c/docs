@@ -1,10 +1,18 @@
 #!/bin/bash
 
-# Создаём и запускаем nginx контейнер
-# 1. В фоновом режиме
-# 2. Мапим порт к host машине
-# 3. Устанавливаем имя контейнера
-docker container run -d -p 80:80 --name proxy nginx
+# удалить предыдущий контейнер
+docker container rm -f proxy
+docker network rm frontend
 
-#  Вернёт ошибку так как имя контейнера должно быть уникальным
-docker container run -d -p 8080:80 --name proxy nginx
+# Создаём сеть
+docker network create frontend
+
+# Запустить контейне с nginx.
+# docker container run -d -p 80:80 --name proxy nginx
+
+#OR
+# добавляет контенер в определённую сеть
+docker container run -d -p 80:80 --name proxy --net frontend nginx
+
+# Получить детальную информацию о сети
+docker network inspect frontend

@@ -1,11 +1,18 @@
 #!/bin/bash
 
-# Создаём и запускаем nginx контейнер
-# 1. В фоновом режиме
-# 2. Мапим порт к host машине
-# 3. Устанавливаем имя контейнера
-# 4. Определяем healthcheck
-docker container run -d -p 80:80 --name proxy --health-cmd 'curl http://localhost:80/' --health-retries 3 --health-interval '1s' nginx
+# удалить предыдущий контейнер
+docker container rm -f proxy
+docker network rm frontend
 
-# Для того что бы исправить статус на healthy необходимо установить в контейнере curl.
-# apt-get update && apt-get install curl -y
+# Создаём сеть
+docker network create frontend
+
+# Запустить контейне с nginx.
+docker container run -d --net frontend --net-alias search elasticsearch:2
+docker container run -d --net frontend --net-alias search elasticsearch:2
+
+# nslookup
+docker container run --rm --net frontend alpine nslookup search
+
+# curl server info
+# docker container run --rm --net frontend centos curl -s search:9200

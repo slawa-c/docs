@@ -1,9 +1,14 @@
 #!/bin/bash
 
-# Создаём и запускаем nginx контейнер
-# 1. В фоновом режиме
-# 2. Мапим порт к host машине
-docker container run -d -p 80:80 nginx
+# удалить предыдущий контейнер
+docker container rm -f proxy
+docker network rm frontend
 
-# OR
-# docker container run --detached --publish 80:80 nginx
+# Создаём сеть
+docker network create frontend
+
+# Запустить контейне с nginx.
+docker container run -d -p 80:80 --name proxy nginx
+
+# Присоединить контейнер к сети
+docker network connect frontend proxy

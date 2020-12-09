@@ -1,8 +1,23 @@
-#!/bin/bash:q
+#!/bin/bash
 
+# удалить предыдущий контейнер
+docker container rm -f proxy
+docker network rm frontend
 
-# Создаём и запускаем nginx контейнер
-# 1. В фоновом режиме
-# 2. Мапим порт к host машине
-# 3. Устанавливаем имя контейнера
+# Создаём сеть
+docker network create frontend
+
+# Запустить контейне с nginx.
 docker container run -d -p 80:80 --name proxy nginx
+
+docker container inspect proxy --format "{{ .NetworkSettings.Networks }}" # one network
+
+# Присоединить контейнер к сети
+docker network connect frontend proxy
+
+docker container inspect proxy --format "{{ .NetworkSettings.Networks }}" # two networks
+
+# Отсоединить контейнер от сети
+docker network disconnect frontend proxy
+
+docker container inspect proxy --format "{{ .NetworkSettings.Networks }}" # one network
