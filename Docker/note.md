@@ -149,10 +149,39 @@ ps
 stats
 ```
    
+docker version
+
+docker info
+
+Registry
+```
+docker run - -rm hello-world
+docker container run - -rm hello-world
+```
 
 
 
+docker create <options> <image name:tag>
+docker container create <options> <image name:tag>
+   
 
+CONTAINER INFO
+```
+docker ps <options>
+docker container ls <options>
+
+CONTAINER ID — идентификатор контейнера
+IMAGE — образ на основании которого был создан контейнер
+COMMAND — команда которая используется как основной процесс
+CREATED — время когда был создан контейнер
+STATUS — статус контейнера (запащен, на пазуе, остановлен с ошибкой и т.д.)
+PORTS — внутренние порты и мапинг портов
+NAMES — имя контейнера
+
+```   
+   
+   
+   
 
 
 
