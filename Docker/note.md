@@ -82,6 +82,87 @@ Linux kernel version 3.10 or higher
 512+ Mb of RAM.
 ```
 
+Docker Engine — легковесная среда выполнения, которая управляет образами, контейнерами, сборками образов и т.д.
+
+Docker Daemon — демон выполняет команды которые были отправлены клиентом docker. Сборка образов, запуск контейнеров и т.д.
+
+Dockerfile — файл с набором инструкций который используется для сборки образов (docker image).
+
+Docker Image — файл состоящий из множества слоёв, который используется для выполнения кода в докер контейнерах. Read-only template.
+
+Union File Systems — своего рода объединяемая (stackable) файловая система, которая содержит файлы и каталоги разных файловых систем. 
+Они прозрачно накладываются друг на друга, образуя единую файловую систему.
+
+Docker Volumes — часть данных контейнеров которые ссылаются на внешние носители. 
+Перзистентно сохранять данные внутри контейнеров можно только при наличии docker volumes.
+
+Docker Container — это стандартная единица программного обеспечения, которая упаковывает код и все его зависимости. 
+Контейнеры создаются на основе docker image (образов).
+
+Help
+```
+docker --help
+docker docker-subcommand --help
+```
+
+ОСНОВНЫЕ КОМАНДЫ
+```
+attach 
+build 
+commit 
+cp 
+create 
+diff 
+events 
+exec 
+export 
+history 
+images
+import 
+pull 
+stop 
+info 
+push 
+tag 
+inspect 
+rename 
+top
+kill 
+restart 
+unpause 
+load 
+rm 
+update 
+login 
+rmi 
+version 
+logout 
+run 
+wait 
+logs 
+save
+pause 
+search 
+port 
+start 
+ps 
+stats
+```
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
