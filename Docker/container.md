@@ -63,7 +63,7 @@ docker rm <options> <container name> or <hash>
 docker container rm <options> <container name> or <hash>
 ```
 
-STOP CONTAINER 
+- STOP CONTAINER 
 ```
 docker stop <container name> or <hash>
 docker container stop <container name> or <hash>
