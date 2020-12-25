@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 apt update && \
 #apt-get install dialog -y && \
-#apt install -y curl \ 
+apt install -y curl  
 #dialog --title "YES NO" --msgbox "\n YES" YES && \
 apt install apt-transport-https ca-certificates gnupg2 gnupg-agent software-properties-common -y && \
 curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | apt-key add - && \
