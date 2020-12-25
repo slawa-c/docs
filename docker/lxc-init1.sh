@@ -13,5 +13,5 @@ add-apt-repository \
 apt update && \
 apt upgrade -y && \
 apt install docker-ce docker-ce-cli containerd.io -y && \
-docker run hello-world
-docker ps
+docker run --rm hello-world
+docker ps -a
