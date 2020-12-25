@@ -1,0 +1,7 @@
+# Удалить всё что не используется
+docker system prune -a -f
+
+# удалить все контейнеры
+docker rm -f $(docker ps -aq)
+
+
