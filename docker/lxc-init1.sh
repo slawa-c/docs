@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 apt update && \
 #apt-get install dialog -y && \
+# install curl
 apt install -y curl  
 #dialog --title "YES NO" --msgbox "\n YES" YES && \
 apt install apt-transport-https ca-certificates gnupg2 gnupg-agent software-properties-common -y && \
@@ -13,5 +14,10 @@ add-apt-repository \
 apt update && \
 apt upgrade -y && \
 apt install docker-ce docker-ce-cli containerd.io -y && \
+# run and delete
 docker run --rm hello-world
 docker ps -a
+# delete all images
+docker image rm -f  $(docker image ls -aq)
+docker images
+
