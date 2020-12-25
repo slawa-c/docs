@@ -4,4 +4,8 @@ docker system prune -a -f
 # удалить все контейнеры
 docker rm -f $(docker ps -aq)
 
+# Получаем подробную информацию про образ
+docker image inspect fholzer/nginx-brotli --format "{{.Config.Env}}"
 
+# Получаем подробную информацию про слои
+docker image history --no-trunc fholzer/nginx-brotli
