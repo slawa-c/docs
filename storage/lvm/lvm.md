@@ -100,9 +100,15 @@ vgcreate --help
   Use --longhelp to show all options and advanced commands. 
 ```
 
+
+
 ```
+# create
 vgcreate sas /dev/sd[cb]
+# add disk
+vgextend sas /dev/sdc
 ```
+
 
 ```
 vgs
