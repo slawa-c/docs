@@ -12,3 +12,31 @@ docker image history --no-trunc fholzer/nginx-brotli
 
 # Info for map volume
 docker image inspect mongo --format "{{.Config.Volumes}}"
+
+# Создаём Volume
+docker volume create --driver local \
+    --opt type=tmpfs \
+    --opt device=tmpfs \
+    --opt o=size=100m \
+
+#
+docker container run -d --mount source=storage,target=/usr/share/nginx/html --name webhost nginx:alpine   
+
+#
+docker container run -d \
+    --mount type=bind,source="$(pwd)"/html,target=/usr/share/nginx/html,readonly \
+    --publish 80:80 \
+    --name webhost nginx:alpine
+
+$(pwd) - work dir
+
+#
+docker container run -d \
+    --mount type=bind,source="$(pwd)"/index.html,target=/usr/share/nginx/html/index.html \
+    --mount type=bind,source="$(pwd)"/about.html,target=/usr/share/nginx/html/about.html \
+    --publish 80:80 \
+    --name webhost nginx:alpine
+    
+    
+#
+
