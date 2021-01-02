@@ -1,0 +1,9 @@
+printenv
+
+
+echo $PATH
+
+export PATH=/...
+
+vim .bash_profile
+export PATH=/...
