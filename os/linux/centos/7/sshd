@@ -1,0 +1,29 @@
+How to Install / Enable OpenSSH on CentOS 7
+
+sudo yum –y install openssh-server openssh-clients
+
+systemctl start sshd
+systemctl status sshd
+systemctl enable sshd
+
+vim /etc/ssh/sshd_config
+
+Port 22xxx
+PermitRootLogin yes
+
+Firewall Settings
+vim /etc/sysconfig/iptables
+
+To allow access using the port defined in the sshd config file, add the following line to the iptables file:
+-A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 2002 -j ACCEPT
+
+To restrict access to a specific IP, for example 133.123.40.166, edit the line as follows:
+-A RH-Firewall-1-INPUT -s 133.123.40.166 -m state --state NEW -p tcp --dport 2002 -j ACCEPT
+
+If your site uses IPv6, and you are editing ip6tables, use the line:
+-A RH-Firewall-1-INPUT -m tcp -p tcp --dport 2002 -j ACCEPT
+
+systemctl restart iptables
+
+
+
