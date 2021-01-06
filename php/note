@@ -2,3 +2,74 @@ PHP
 
 https://www.php.net/manual/ru/reserved.variables.server.php
 
+
+
+mod_php is not installed on CentOS 7 with remi's php 5.4
+(https://serverfault.com/questions/1016351/mod-php-is-not-installed-on-centos-7-with-remis-php-5-4-a-bit-of-confusion)
+
+# httpd -M | grep php 
+yum list installed | grep 'http'
+yum list installed | grep 'php'
+
+# httpd -v
+# php -v
+PHP 5.4.16 (cli) (built: Apr  1 2020 04:07:17) 
+Copyright (c) 1997-2013 The PHP Group
+Zend Engine v2.4.0, Copyright (c) 1998-2013 Zend Technologies
+
+# rpm -qa 'php*' | sort
+php-cli-5.4.16-48.el7.x86_64
+php-common-5.4.16-48.el7.x86_64
+php-gd-5.4.16-48.el7.x86_64
+php-intl-5.4.16-48.el7.x86_64
+php-ldap-5.4.16-48.el7.x86_64
+php-mbstring-5.4.16-48.el7.x86_64
+php-mysql-5.4.16-48.el7.x86_64
+php-pdo-5.4.16-48.el7.x86_64
+php-pear-1.9.4-22.el7.noarch
+php-process-5.4.16-48.el7.x86_64
+php-snmp-5.4.16-48.el7.x86_64
+php-xml-5.4.16-48.el7.x86_64
+
+# yum install mod_php
+--> Running transaction check
+---> Package php.x86_64 0:5.4.16-48.el7 will be installed
+--> Finished Dependency Resolution
+
+yum install php
+Package php-5.4.16-48.el7.x86_64 already installed and latest version
+
+#systemctl restart httpd
+
+==============
+
+[autoindex:error] [pid 20115] [client 10.30.6.80:50800] AH01276: Cannot serve directory /usr/share/phpMyAdmin/: No matching DirectoryIndex (index.html) found, and server-generated directory index forbidden by Options directive In this case we want to add index.php to the DirectoryIndex directive.
+(https://www.liquidweb.com/kb/apache-error-no-matching-directoryindex-index-html-found-solved/)
+
+# vim /etc/httpd/conf/httpd.conf
+
+Change: <IfModule dir_module> DirectoryIndex index.html </IfModule> to:
+<IfModule dir_module> DirectoryIndex index.html index.php </IfModule>
+
+# systemctl restart httpd
+
+======
+
+I wanted to switch from PHP 5.4 to PHP 5.6 without remove the older version from the machine.
+
+# yum install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+# yum install yum-utils
+# yum-config-manager --enable remi-php56
+# yum update
+# yum install php56 php56-php
+
+In /etc/httpd/conf.modules.d you now should have 2 different files for configuring PHP: 10-php56-php.conf 10-php.conf Rename the oldest and restart the server.
+# mv 10-php.conf 10-php.conf.no
+
+# service httpd restart
+
+
+
+
+
+
