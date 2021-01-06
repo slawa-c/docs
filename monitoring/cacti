@@ -1,0 +1,190 @@
+https://serverspace.by/support/help/ustanovka-cacti-na-centos-7/
+
+Что такое Cacti?
+Cacti — это инструмент с открытым исходным кодом для мониторинга сервера, визуализации собранных данных и построения графиков, написан на PHP/MySQL. Cacti использует RRDTool (инструмент для работы с базами данных Round-Robin) для хранения данных и генерации графики, сборка периодических данных происходит через Net-SNMP — набор приложений для реализации SNMP (Simple Network Management Protocol).
+
+Настройка репозиториев
+Необходимо отключить функции безопасности SELinux, для этого с помощью текстового редактора, например vi откройте следующий системный файл:
+vi /etc/sysconfig/selinux
+
+Измените значение параметра SELINUX на disabled:
+SELINUX=disabled
+
+Перезагрузите виртуальный сервер, чтобы изменения вступили в силу:
+reboot
+
+Настройте репозиторий EPEL:
+rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+
+Установите репозиторий Remi:
+wget http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+rpm -Uvh remi-release-7.rpm
+
+Выведите список доступных репозиториев:
+yum repolist
+
+Установка компонентов
+В первую очередь необходимо установить веб-сервер Apache:
+yum install httpd httpd-devel
+systemctl start httpd
+
+Установите утилиты RRDTool и SNMP, для дальнейшей обработки и визуализации данных:
+yum install net-snmp net-snmp-utils net-snmp-libs rrdtool
+systemctl start snmpd
+
+Далее установите MariaDB и запустите сервис:
+yum install mariadb-server
+systemctl start mariadb
+
+Запустите скрипт, с помощью которого задайте пароль администратора и дополнительные параметры безопасности:
+mysql_secure_installation
+
+Запустите следующую команду, чтобы установить несколько компонентов PHP:
+yum --enablerepo=remi install php-mysql php-pear php-common php-gd php-devel php php-mbstring php-cli php-intl php-snmp
+
+Создание базы данных Cacti
+Подключитесь к СУБД MariaDB:
+mysql -u root -p
+
+С помощью следующих команд создайте БД и пользователя, задав надежный пароль:
+CREATE DATABASE fosslinuxcacti;
+CREATE USER 'fosslinuxuser'@'localhost' IDENTIFIED BY 'password';
+
+Предоставьте привилегии пользователю:
+grant all privileges on fosslinuxcacti.* to fosslinuxuser@localhost;
+FLUSH PRIVILEGES;
+
+Созданный пользователь базы данных должен иметь доступ к таблице mysql.time_zone_name. Поэтому необходимо импортировать mysql_test_data_timezone.sql в базу данных MySQL:
+mysql -u root -p mysql < /usr/share/mysql/mysql_test_data_timezone.sql
+
+Выполните вход в MariaDB:
+mysql -u root -p
+
+Предоставьте доступ пользователю базы данных cacti и обновите привилегии:
+GRANT SELECT ON mysql.time_zone_name TO fosslinuxuser@localhost;
+FLUSH PRIVILEGES;
+
+Оптимизация базы данных
+Для повышения производительности нужно изменить параметры базы данных. Откройте файл конфигурации.
+vi /etc/my.cnf.d/server.cnf
+
+Вставьте следующие строки в секцию [mysqld]:
+event_scheduler=ON
+plugin-load=BLACKHOLE=ha_blackhole.so
+blackhole=FORCE
+collation-server = utf8mb4_unicode_ci
+init-connect='SET NAMES utf8'
+character-set-server = utf8mb4
+max_heap_table_size = 128M
+max_allowed_packet = 16777216
+tmp_table_size = 64M
+join_buffer_size = 64M
+innodb_file_per_table = on
+innodb_buffer_pool_size = 512M
+innodb_doublewrite = off
+innodb_additional_mem_pool_size = 80M
+innodb_lock_wait_timeout = 50
+innodb_flush_log_at_trx_commit = 2
+innodb_file_format = Barracuda
+innodb_large_prefix = 1
+innodb_flush_log_at_timeout = 3
+innodb_read_io_threads = 32
+innodb_write_io_threads = 16
+innodb_io_capacity = 5000
+innodb_io_capacity_max = 10000
+
+Перезапустите СУБД для применения изменений:
+systemctl restart mariadb.service
+
+Установка и конфигурация Cacti
+Установите Cacti используя yum:
+yum -y install cacti
+
+Импортируйте файл базы данных cacti по умолчанию в созданную базу данных.
+cd /usr/share/doc/cacti-1.2.5/
+
+Примечание: версия Cacti может отличаться.
+
+Импортируйте SQL-файл:
+mysql -u root -p fosslinuxcacti < cacti.sql
+
+Отредактируйте файл конфигурации Cacti, указав базу данных, пароль, пользователя и пр.:
+vi /usr/share/cacti/include/config.php
+
+Измените следующие параметры:
+$database_type = 'mysql';
+$database_default = 'fosslinuxcacti';
+$database_hostname = 'localhost';
+$database_username = 'fosslinuxuser';
+$database_password = 'password';
+$database_port = '3306';
+$database_ssl = false;
+
+Настройка Apache
+Выполнить настройку Apache необходимо для удаленного подключения:
+vi /etc/httpd/conf.d/cacti.conf
+
+Замените строку Require host localhost на Require all granted и Allow from localhost на Allow from all.
+Файл будет выглядеть следующем образом:
+Alias /cacti /usr/share/cacti
+
+<Directory /usr/share/cacti/>
+<IfModule mod_authz_core.c>
+# httpd 2.4
+Require all granted
+</IfModule>
+<IfModule !mod_authz_core.c>
+# httpd 2.2
+Order deny,allow
+Deny from all
+Allow from all
+</IfModule>
+</Directory>
+
+<Directory /usr/share/cacti/log>
+<IfModule mod_authz_core.c>
+Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+Order deny,allow
+Deny from all
+</IfModule>
+</Directory>
+
+<Directory /usr/share/cacti/rra>
+<IfModule mod_authz_core.c>
+Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+Order deny,allow
+Deny from all
+</IfModule>
+</Directory>
+
+Далее откройте файл конфигурации PHP:
+vi /etc/php.ini
+
+Измените значения следующих параметров:
+date.timezone = Europe/Minsk
+memory_limit = 800M
+max_execution_time = 360
+
+Перезапустите запущенные сервисы:
+systemctl restart httpd.service
+systemctl restart mariadb.service
+systemctl restart snmpd.service
+
+Не забудьте настроить Firewall, чтобы подключиться Cacti:
+firewall-cmd --permanent --zone=public --add-service=http
+firewall-cmd --reload
+
+Подключение к веб-интерфейсу Cacti
+Перейдите в браузере по следующему адресу:
+<Ваш_домен_или_IP-адрес>/cacti
+
+Например:
+121.123.123.121/cacti
+
+При первом подключении используйте логин и пароль admin/admin:
+
+
