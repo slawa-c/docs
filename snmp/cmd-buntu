@@ -1,0 +1,51 @@
+smnp
+
+ubuntu
+-- configure client
+apt install smnpd
+ll /etc/snmp/snmp.conf
+cp /etc/snmp/snmp.conf /etc/snmp/snmp.conf_orig
+rm /etc/snmp/snmp.conf
+
+vim /etc/snmp/snmp.conf
+rocommunity wspublic 10.0.0.0/8
+rocommunity wspublic 127.0.0.1
+syslocation "ZWSH10"
+syscontact "vitovts@grodno.net"
+
+apt install snmp-mibs-downloader
+
+vim /etc/default/snmpd
+export MIBS= --> #export MIBS=
+
+service snmpd restart
+
+netstat -au // aun
+ps aux | grep snmp
+
+-- server
+apt update
+apt upgrade -y
+
+LAMP(LEMP)
+apt install apache2 mysql-server-5.6 php libapache2-mod-php -y
+snmp smnpd rrdtools -y
+
+apt install cacti cacti-spine -y
+
+service smnpd restart
+mysql
+apache2
+
+
+
+snmpwalk -v 2c -c wspublic -O fn 192.168.1.1 |grep ISP
+snmpwalk -Os -c wspublic -v 2c 10.172.0.1 iso.3.6.1.2.1.25.1.1.0
+
+uptime
+
+
+
+
+
+
