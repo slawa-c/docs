@@ -38,7 +38,7 @@ LAMP(LEMP)
 dpkg-reconfigure tzdata
 apt-get install ntpdate
 # Команда Ntpdate использовалась для установки правильной даты и времени с помощью сервера: pool.ntp.br 
-ntpdate ntp1.stratum2.ru
+ntpdate -q ntp1.stratum2.ru
 # Давайте установим службу NTP.
 timedatectl set-ntp 0
 # NTP - это сервис, который будет обновлять наш сервер.
@@ -48,7 +48,7 @@ date
 
 
 
-apt install mysql-server mysql-client
+apt install -y mysql-server mysql-client
 mysql_secure_installation
 vim /etc/mysql/mysql.conf.d/mysqld.cnf
 >>>
@@ -70,42 +70,32 @@ mysql -u root -p
 # создания базы данных с именем cacti.
 CREATE DATABASE cacti;
 # создания пользователя базы данных с именем cacti.
-CREATE USER 'cactiuser'@'%' IDENTIFIED BY 'kamisama123';
+CREATE USER 'cacti'@'%' IDENTIFIED BY 'QwertyWS1$';
 # Дайте пользователю SQL cacti разрешение на базу данных cacti.
-GRANT ALL PRIVILEGES ON cacti.* TO 'cactiuser'@'%';
-#
-flush privileges;
-quit;
+GRANT ALL PRIVILEGES ON cacti.* TO 'cacti'@'%';
+FLUSH PRIVILEGES;
+QUIT;
 
-cd /var/www/html
-wget
-tar -zxf cacti 
-chown -R www-data:www-data cacti/
-ll
-vim src/include/config.php
--->> cacti
-
-# Импортируйте конфигурацию базы данных MySQL, используя корневую учетную запись MySQL.
+# Импорт конфигурации базы данных MySQL, используя корневую учетную запись MySQL.
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p mysql
-
 # В MySQL предоставьте Cacti доступ к базе данных TimeZone.
 mysql -u root -p
-GRANT SELECT ON mysql.time_zone_name TO cactiuser@'%';
-quit;
+GRANT SELECT ON mysql.time_zone_name TO cacti@'%';
+QUIT;
 
-# установка Cacti Apache Frontend
 
-apt install -y apache2 php libapache2-mod-php php-cli php-snmp php-mysql php-mbstring php-gd php-xml php-ldap php-gmp php-intl php-recode php-gettext
-apt install -y php-pear php-pspell php-memcache
+# Cacti Apache Frontend
+
+apt install -y apache2 php libapache2-mod-php php-cli php-snmp php-mysql php-mbstring \ 
+php-gd php-xml php-ldap php-gmp php-intl php-recode php-gettext php-pear php-pspell php-memcache
 
 vim /etc/apache2/mods-enabled/dir.conf
 <IfModule mod_dir.c>
 DirectoryIndex index.php index.html index.cgi index.pl index.xhtml index.htm
 </IfModule>
 
-
-# updatedb
-# locate php.ini
+updatedb
+locate php.ini
 /etc/php/7.2/apache2/php.ini
 /etc/php/7.2/cli/php.ini
 
@@ -113,7 +103,7 @@ DirectoryIndex index.php index.html index.cgi index.pl index.xhtml index.htm
 vim /etc/php/7.2/apache2/php.ini
 >>>
 max_execution_time = 300
-memory_limit = 500M
+memory_limit = 512M
 post_max_size = 32M
 max_input_time = 300
 date.timezone = Europe/Minsk
@@ -129,39 +119,15 @@ systemctl restart apache2
 service apache2 status
 
 
-apt install -y snmp snmpd rrdtool libmysql++-dev libsnmp-dev help2man dos2unix autoconf dh-autoreconf libssl-dev librrds-perl snmp-mibs-downloader
-
-
-
-spine
-
-# cd /downloads
-# wget https://www.cacti.net/downloads/spine/cacti-spine-1.2.3.tar.gz
-# tar -zxvf cacti-spine-1.2.3.tar.gz
-# cd cacti-spine-1.2.3
-# mkdir m4
-# ./bootstrap
-# ./configure
-# make
-# make install
-# chown root:root /usr/local/spine/bin/spine
-# chmod +s /usr/local/spine/bin/spine
-
-cp /usr/local/spine/etc/spine.conf.dist /usr/local/spine/etc/spine.conf
-# vim /usr/local/spine/etc/spine.conf
->>>
-DB_Host       localhost
-DB_Database   cacti
-DB_User       cacti
-DB_Pass       QwertyWS1$
-DB_Port       3306
-
-
-mv /downloads/cacti-1.2.3 /var/www/html/cacti
+wget wget https://www.cacti.net/downloads/cacti-1.2.16.tar.gz
+wget https://www.cacti.net/downloads/spine/cacti-spine-1.2.16.tar.gz
+tar -C /var/www/html/  -zxf cacti-1.2.16.tar.gz 
+vim /var/www/html/cacti-1.2.16/ /var/www/html/cacti
 touch /var/www/html/cacti/log/cacti.log
 touch /var/www/html/cacti/log/cacti_stderr.log
-chown www-data.www-data /var/www/html/cacti -R
+chown -R www-data:www-data /var/www/html/cacti/
 
+ll
 
 vim /var/www/html/cacti/include/config.php
 >>>
@@ -178,12 +144,34 @@ $database_ssl_cert = '';
 $database_ssl_ca   = '';
 <<<
 
+apt install -y snmp snmpd rrdtool libmysql++-dev libsnmp-dev help2man dos2unix autoconf \
+dh-autoreconf libssl-dev librrds-perl snmp-mibs-downloader
 
 
+spine
+wget https://www.cacti.net/downloads/spine/cacti-spine-1.2.3.tar.gz
+tar -zxvf cacti-spine-1.2.3.tar.gz
+cd cacti-spine-1.2.3
+mkdir m4
+./bootstrap
+./configure
+make
+make install
+chown root:root /usr/local/spine/bin/spine
+chmod +s /usr/local/spine/bin/spine
+
+cp /usr/local/spine/etc/spine.conf.dist /usr/local/spine/etc/spine.conf
+
+vim /usr/local/spine/etc/spine.conf
+>>>
+DB_Host       localhost
+DB_Database   cacti
+DB_User       cacti
+DB_Pass       QwertyWS1$
+DB_Port       3306
 
 
-
-http://x.x.x.x/cacti/src/
+http://x.x.x.x/cacti/
 ---
 
 The Cacti Database has not been initialized. Please initilize it before continuing.
