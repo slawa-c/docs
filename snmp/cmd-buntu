@@ -46,8 +46,6 @@ apt-get install ntp
 # Используйте команду date для проверки даты и времени, настроенных на вашем Ubuntu Linux.
 date
 
-
-
 apt install -y mysql-server mysql-client
 mysql_secure_installation
 vim /etc/mysql/mysql.conf.d/mysqld.cnf
@@ -56,13 +54,15 @@ vim /etc/mysql/mysql.conf.d/mysqld.cnf
 character-set-client-handshake = FALSE
 character-set-server = utf8mb4
 collation-server = utf8mb4_unicode_ci
-join_buffer_size = 31M
+join_buffer_size = 32M
 innodb_buffer_pool_size = 240M
-innodb_doublewrite = OFF
+innodb_doublewrite = On
 innodb_flush_log_at_timeout = 3
 innodb_read_io_threads = 32
 innodb_write_io_threads = 16
 innodb_buffer_pool_instances = 3
+innodb_io_capacity = 5000
+innodb_io_capacity_max = 10000
 <<<
 service mysql restart
 
@@ -98,7 +98,6 @@ updatedb
 locate php.ini
 /etc/php/7.2/apache2/php.ini
 /etc/php/7.2/cli/php.ini
-
 
 vim /etc/php/7.2/apache2/php.ini
 >>>
@@ -169,6 +168,10 @@ DB_Database   cacti
 DB_User       cacti
 DB_Pass       QwertyWS1$
 DB_Port       3306
+
+
+mysql -uroot -p cacti < /var/www/html/cacti/cacti.sql  
+
 
 
 http://x.x.x.x/cacti/
