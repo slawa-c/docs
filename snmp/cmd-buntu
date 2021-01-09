@@ -28,30 +28,180 @@ apt update
 apt upgrade -y
 
 apt install git -y
-
-LAMP(LEMP)
-apt install mariadb-server
-apt install apache2 php php-gd php-xml php-mysql php-snmp rrdtool -y
-php -v
 cd /var/www/html/
 git clone https://github.com/Cacti/cacti.git
+
+LAMP(LEMP)
+////apt install mariadb-server apache2 php php-gd php-xml php-mysql php-snmp rrdtool -y
+
+#time.zones
+dpkg-reconfigure tzdata
+apt-get install ntpdate
+# Команда Ntpdate использовалась для установки правильной даты и времени с помощью сервера: pool.ntp.br 
+ntpdate ntp1.stratum2.ru
+# Давайте установим службу NTP.
+timedatectl set-ntp 0
+# NTP - это сервис, который будет обновлять наш сервер.
+apt-get install ntp
+# Используйте команду date для проверки даты и времени, настроенных на вашем Ubuntu Linux.
+date
+
+
+
+apt install mysql-server mysql-client
+mysql_secure_installation
+vim /etc/mysql/mysql.conf.d/mysqld.cnf
+>>>
+[mysqld]
+character-set-client-handshake = FALSE
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+join_buffer_size = 31M
+innodb_buffer_pool_size = 240M
+innodb_doublewrite = OFF
+innodb_flush_log_at_timeout = 3
+innodb_read_io_threads = 32
+innodb_write_io_threads = 16
+innodb_buffer_pool_instances = 3
+<<<
+service mysql restart
+
+mysql -u root -p 
+# создания базы данных с именем cacti.
+CREATE DATABASE cacti;
+# создания пользователя базы данных с именем cacti.
+CREATE USER 'cactiuser'@'%' IDENTIFIED BY 'kamisama123';
+# Дайте пользователю SQL cacti разрешение на базу данных cacti.
+GRANT ALL PRIVILEGES ON cacti.* TO 'cactiuser'@'%';
+#
+flush privileges;
+quit;
+
+cd /var/www/html
+wget
+tar -zxf cacti 
 chown -R www-data:www-data cacti/
 ll
 vim src/include/config.php
 -->> cacti
 
-mysql_secure_installation
+# Импортируйте конфигурацию базы данных MySQL, используя корневую учетную запись MySQL.
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p mysql
 
-# mysql -u root -p 
-Enter password: 
-MariaDB [(none)]> create database cacti;
-Query OK, 1 row affected (0.00 sec)
-MariaDB [(none)]> GRANT ALL PRIVILEGES ON cacti.* TO cacti IDENTIFIED BY 'cacti'; 
-Query OK, 0 rows affected (0.00 sec)
-MariaDB [(none)]> flush privileges;
-Query OK, 0 rows affected (0.00 sec)
+# В MySQL предоставьте Cacti доступ к базе данных TimeZone.
+mysql -u root -p
+GRANT SELECT ON mysql.time_zone_name TO cactiuser@'%';
+quit;
+
+# установка Cacti Apache Frontend
+
+apt install -y apache2 php libapache2-mod-php php-cli php-snmp php-mysql php-mbstring php-gd php-xml php-ldap php-gmp php-intl php-recode php-gettext
+apt install -y php-pear php-pspell php-memcache
+
+vim /etc/apache2/mods-enabled/dir.conf
+<IfModule mod_dir.c>
+DirectoryIndex index.php index.html index.cgi index.pl index.xhtml index.htm
+</IfModule>
 
 
+# updatedb
+# locate php.ini
+/etc/php/7.2/apache2/php.ini
+/etc/php/7.2/cli/php.ini
+
+
+vim /etc/php/7.2/apache2/php.ini
+>>>
+max_execution_time = 300
+memory_limit = 500M
+post_max_size = 32M
+max_input_time = 300
+date.timezone = Europe/Minsk
+register_argc_argv = On
+<<<
+
+vim /etc/php/7.2/cli/php.ini
+>>>
+date.timezone = Europe/Minsk
+<<<<
+
+systemctl restart apache2
+service apache2 status
+
+
+apt install -y snmp snmpd rrdtool libmysql++-dev libsnmp-dev help2man dos2unix autoconf dh-autoreconf libssl-dev librrds-perl snmp-mibs-downloader
+
+
+
+spine
+
+# cd /downloads
+# wget https://www.cacti.net/downloads/spine/cacti-spine-1.2.3.tar.gz
+# tar -zxvf cacti-spine-1.2.3.tar.gz
+# cd cacti-spine-1.2.3
+# mkdir m4
+# ./bootstrap
+# ./configure
+# make
+# make install
+# chown root:root /usr/local/spine/bin/spine
+# chmod +s /usr/local/spine/bin/spine
+
+cp /usr/local/spine/etc/spine.conf.dist /usr/local/spine/etc/spine.conf
+# vim /usr/local/spine/etc/spine.conf
+>>>
+DB_Host       localhost
+DB_Database   cacti
+DB_User       cacti
+DB_Pass       QwertyWS1$
+DB_Port       3306
+
+
+mv /downloads/cacti-1.2.3 /var/www/html/cacti
+touch /var/www/html/cacti/log/cacti.log
+touch /var/www/html/cacti/log/cacti_stderr.log
+chown www-data.www-data /var/www/html/cacti -R
+
+
+vim /var/www/html/cacti/include/config.php
+>>>
+$database_type     = 'mysql';
+$database_default  = 'cacti';
+$database_hostname = 'localhost';
+$database_username = 'cacti';
+$database_password = 'QwertyWS1$';
+$database_port     = '3306';
+$database_retries  = 5;
+$database_ssl      = false;
+$database_ssl_key  = '';
+$database_ssl_cert = '';
+$database_ssl_ca   = '';
+<<<
+
+
+
+
+
+
+http://x.x.x.x/cacti/src/
+---
+
+The Cacti Database has not been initialized. Please initilize it before continuing.
+
+To initilize the Cacti database, issue the following commands either as root or using a valid account.
+
+mysqladmin -uroot -p create cacti
+mysql -uroot -p -e "grant all on cacti.* to 'cacti'@'localhost' identified by 'cacti'"
+mysql -uroot -p -e "grant select on mysql.time_zone_name to 'cacti'@'localhost' identified by 'cacti'"
+locate cacti.sql
+mysql -uroot -p cacti < /.../cacti.sql
+
+Where /pathcacti/ is the path to your Cacti install location.
+Change someuser and somepassword to match your site preferences. The defaults are cactiuser for both user and password.
+
+NOTE: When installing a remote poller, the config.php file must be writable by the Web Server account, 
+and must include valid connection information to the main Cacti server. 
+The file should be changed to read only after the install is completed.
 
 
 
