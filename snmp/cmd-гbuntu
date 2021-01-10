@@ -1,13 +1,17 @@
 smnp
 
 ubuntu
--- configure client
-apt install -y snmp smnpd
+###configure client
+https://kifarunix.com/install-and-configure-snmp-ubuntu-18-04-and-centos-7/
+apt install -y snmp smnpd libsnmp-dev
+
 ll /etc/snmp/snmp.conf
 cp /etc/snmp/snmp.conf /etc/snmp/snmp.conf_orig
-rm /etc/snmp/snmp.conf
-
 vim /etc/snmp/snmp.conf
+
+cp /etc/snmp/snmpd.conf /etc/snmp/snmpd.conf_orig
+vim /etc/snmp/snmpd.conf
+agentAddress udp:127.0.0.1:161,udp:192.168.43.154:161
 rocommunity wspublic 10.0.0.0/8
 rocommunity wspublic 127.0.0.1
 syslocation "ZWSH10"
