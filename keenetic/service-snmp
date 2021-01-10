@@ -1,0 +1,7 @@
+SNMP
+
+service snmp
+snmp community CogniteqWS$SNMP
+snmp location grodno.cogniteq
+snmp contact vitaly.smirnov@cogniteq.com
+system configuration save
