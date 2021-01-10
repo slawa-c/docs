@@ -2,7 +2,7 @@ smnp
 
 ubuntu
 -- configure client
-apt install smnpd
+apt install -y snmp smnpd
 ll /etc/snmp/snmp.conf
 cp /etc/snmp/snmp.conf /etc/snmp/snmp.conf_orig
 rm /etc/snmp/snmp.conf
