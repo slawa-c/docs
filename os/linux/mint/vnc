@@ -1,0 +1,105 @@
+apt-get install tightvncserver
+
+tightvncserver
+# passwd
+# re-passwd
+# n
+
+netstat -nlpt
+
+vncserver -kill :1
+
+cat <<EOF > /usr/local/bin/wsvnc
+#!/bin/bash
+PATH="$PATH:/usr/bin/"
+DISPLAY="1"
+DEPTH="16"
+GEOMETRY="1024x768"
+OPTIONS="-depth ${DEPTH} -geometry ${GEOMETRY} :${DISPLAY}"
+
+case "$1" in
+start)
+/usr/bin/vncserver ${OPTIONS}
+;;
+
+stop)
+/usr/bin/vncserver -kill :${DISPLAY}
+;;
+
+restart)
+$0 stop
+$0 start
+;;
+esac
+exit 0
+EOF
+
+chmod +x /usr/local/bin/wsvnc
+
+cat <<EOF > /lib/systemd/system/wsvnc.service
+[Unit]
+Description=WSVnc
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/wsvnc start
+ExecStop=/usr/local/bin/wsvnc stop
+ExecReload=/usr/local/bin/wsvnc restart
+User=vnc
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl enable wsvnc.service
+systemctl -l status wsvnc.service
+
+reboot
+
+
+#maxvnc
+
+cat <<EOF > /usr/local/bin/maxvnc
+#!/bin/bash
+PATH="$PATH:/usr/bin/"
+DISPLAY="1"
+DEPTH="16"
+GEOMETRY="1024x768"
+OPTIONS="-depth ${DEPTH} -geometry ${GEOMETRY} :${DISPLAY}"
+
+case "$1" in
+start)
+/usr/bin/vncserver ${OPTIONS}
+;;
+
+stop)
+/usr/bin/vncserver -kill :${DISPLAY}
+;;
+
+restart)
+$0 stop
+$0 start
+;;
+esac
+exit 0
+EOF
+
+chmod +x /usr/local/bin/maxvnc
+
+cat <<EOF > /lib/systemd/system/maxvnc.service
+[Unit]
+Description=WSVnc
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/maxvnc start
+ExecStop=/usr/local/bin/maxvnc stop
+ExecReload=/usr/local/bin/maxvnc restart
+User=vnc
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl enable maxvnc.service
+systemctl -l status maxvnc.service
