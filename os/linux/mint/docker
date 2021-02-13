@@ -1,0 +1,42 @@
+#install Docker + Docker Compose 
+su -
+apt-get update
+apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+#key GPG
+apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+#add
+cat <<EOF > /etc/apt/sources.list.d/additional-repositories.list
+deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+EOF
+#install
+apt-get update
+apt-get -y  install docker-ce docker-compose
+#add to $USER
+sudo usermod -aG docker $USER ;usermod -aG docker ws
+#run test
+docker run --rm -it  --name test alpine:latest /bin/sh
+#kubectl witch curl
+curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+mv ./kubectl /usr/local/bin/kubectl
+kubectl version --client
+#minikube
+
+sudo mv /home/ws/.kube /home/ws/.minikube $HOME
+sudo chown -R $USER $HOME/.kube $HOME/.minikube
+
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x minikube
+mkdir -p /usr/local/bin/
+install minikube /usr/local/bin/
+
+sudo apt-get update && sudo apt-get install -y apt-transport-https curl
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+cat <<EOF > /etc/apt/sources.list.d/kubernetes.list
+deb https://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+
+minikube start --vm-driver=virtualbox
+
