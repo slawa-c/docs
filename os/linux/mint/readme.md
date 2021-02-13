@@ -33,6 +33,7 @@ Restart your system.
 inst
 ```
 sudo dpkg -i xxx.deb
+
 sudo apt-get -f install
 ```
 
