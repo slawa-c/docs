@@ -1,0 +1,75 @@
+VMWare
+
+#https://kb.vmware.com/s/article/1018414
+
+1. install VMware Tools in a Linux guest operating system using Compiler:
+ 
+
+    Ensure that your Linux virtual machine is powered on.
+     
+    If you are running a GUI interface, open a command shell.
+
+    Note: Log in as a root user, or use the sudo command to complete each of these steps.
+     
+     Right Click VM in the virtual machine menu, then click Guest > Install/Upgrade VMware Tools.
+    Click OK.
+
+    Note: In some cases, verify that the CDROM device is Connected from within the Edit Settings option of the virtual machine.
+     
+    To create a mount point, run:
+
+    mkdir /mnt/cdrom
+     
+    To mount the CDROM, run:
+
+    mount /dev/cdrom /mnt/cdrom
+     
+    To copy the Compiler gzip tar file to a temporary local directory, run:
+
+    cp /mnt/cdrom/VMwareTools-version.tar.gz /tmp/
+
+    Where version is the VMware Tools package version.
+     
+    To determine the version of VMware tools, run:
+
+    ls /mnt/cdrom
+
+    You see output similar to:
+
+    # VMwareTools-5.0.0-12124.tar.gz
+     
+    To change to the tmp directory and extract the contents of the tar file into a new directory called vmware-tools-distrib, run:
+
+    cd /tmp
+    tar -zxvf VMwareTools-version.tar.gz
+     
+    To change directory to vmware-tools-distrib and run the vmware-install.pl PERL script to install VMware Tools, run:
+
+    cd vmware-tools-distrib
+    ./vmware-install.pl
+
+    Notes:
+        Complete the screen prompts to install the VMware Tools. Options in square brackets are default choices and can be selected by pressing Enter.
+        To compile VMware Tools successfully, you need gcc Compiler and Linux Kernel sources provided by your Linux distribution. Consult your Linux distribution documentation for details on methods to install these packages.
+        It is normal for the console screen to go blank for a short time during the installation when the display size changes.
+        Some warnings or errors are normal, like when a files does not exist.
+        Depending on the Linux distribution, your network service might restart after installation. VMware recommends that you invoke this command from the console and not remotely.
+         
+    If you are running a GUI interface, restart your X Window session for any mouse or graphics changes to take effect.
+     
+    To start VMware Tools running in the background during an X Window session, run:
+
+    /usr/bin/vmware-toolbox &
+     
+    Depending on your environment, you may need to unmount the CD-ROM. To unmount the CD-ROM, run:
+
+    umount /mnt/cdrom
+     
+    Depending on your environment, you may need to manually end the VMware Tools installation. To end the VMware Tools install, click VM in the virtual machine menu, then click Guest > End VMware Tools Install.
+     
+    To remove VMware Tools installation packages, run:
+
+    cd
+    rm /tmp/VMwareTools-version.tar.gz
+    rm -rf /tmp/vmware-tools-distrib
+    
