@@ -27,3 +27,13 @@ Your system will boot up to a passwordless root shell.
 Type in passwd yourusername
 Set your new password.
 Restart your system.
+
+
+
+inst
+```
+sudo dpkg -i xxx.deb
+sudo apt-get -f install
+```
+
+
