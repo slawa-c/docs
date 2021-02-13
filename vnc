@@ -1,0 +1,6 @@
+Источник <https://flammlin.com/blog/2019/10/12/tightvnc-password-regedit/> 
+
+HKEY_LOCAL_MACHINE\SOFTWARE\TightVNC\Server
+  ControlPassword
+  
+  https://flammlin.com/wp-content/uploads/2019/10/vncpwd.zip
