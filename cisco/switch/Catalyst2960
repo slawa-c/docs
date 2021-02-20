@@ -1,0 +1,17 @@
+====== Cisco Catalyst 2960 ======
+
+
+
+
+
+Enable VTP
+
+<code>
+IOS: c2960-lanbasek9-mz.150-1.SE1.bin
+
+sdm prefer lanbase-routing 
+ 
+ip routing
+
+ip route 0.0.0.0 0.0.0.0 10.16.x.x
+</code>
