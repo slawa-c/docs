@@ -1,0 +1,7 @@
+
+show license right-to-use
+
+
+license right-to-use activate ipservices all acceptEULA
+
+reboot
