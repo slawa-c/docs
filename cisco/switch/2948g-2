@@ -1,0 +1,282 @@
+====== Upgrading the ROMMON ======
+
+
+Follow these guidelines to upgrade the ROMMON on your switch:
+Caution To avoid actions that might make your system unbootable, read this entire section before starting the upgrade.
+
+You can do this procedure entirely over a Telnet connection, but if something fails, you will need to have access to the console serial port. If done improperly, the system can become unbootable. You will then have to return it to Cisco for repair.
+
+This section describes an upgrade to ROMMON version 6.1(5). The same procedure applies to other ROMMON versions, but you will have to substitute appropriate version numbers in the upgrade image names.
+
+Step 1 Download the promupgrade program from Cisco.com and place it on a TFTP server in a directory that is accessible from the switch to be upgraded.
+
+The promupgrade programs are available at the same location on Cisco.com where you download Catalyst 4500 series system images.
+
+To upgrade to ROMMON version 6.1(5), download the cat4000-promupgrade.6-1-5.bin file.
+
+Step 2 In privileged mode on your switch, use the show version command to verify the ROMMON version loaded on the switch.
+
+The ROMMON version number is listed as the System Bootstrap Version. For example, in the following output, the system is running ROMMON version 6.1(2):
+
+Console> (enable) show version
+
+WS-C4003 Software, Version NmpSW:5.5(8)
+
+Copyright (c) 1995-2001 by Cisco Systems, Inc.
+
+NMP S/W compiled on May 24 2001, 21:12:09
+
+GSP S/W compiled on May 24 2001, 18:39:50
+
+
+System Bootstrap Version:6.1(2)
+
+
+Hardware Version:1.0  Model:WS-C4003  Serial #:xxxxxxxxx
+
+Console > (enable)
+
+Step 3 Use the dir bootflash: command to ensure that there is sufficient space in Flash memory to store the promupgrade image. If there is insufficient space, delete one or more images and then enter the squeeze bootflash: command to reclaim the space.
+
+Step 4 Download the promupgrade image into Flash memory using the copy tftp command.
+
+This example shows how to download the promupgrade image cat4000-promupgrade.6-1-5.bin from the remote host Lab_Server to bootflash:
+
+Console> (enable) copy tftp flash
+
+IP address or name of remote host []? Lab_Server
+
+Name of file to copy from []? /cat4000-promupgrade.6-1-5.bin
+
+Flash device []? bootflash
+
+Name of file to copy to []? cat4000-promupgrade.6-1-5.bin
+
+
+9205592 bytes available on device bootflash, proceed (y/n) [n]? y
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+
+File has been copied successfully.
+
+Console > (enable)
+
+
+Step 5 Ensure that the last line in the output of the show boot command is boot:image specified by the boot system commands.
+
+•If the last line in the output of the show boot command is not boot:image specified by the boot system commands, go to Step 6.
+
+•If the last line in the output of the show boot command is boot:image specified by the boot system commands, go to Step 7.
+
+This example shows the autoboot configuration:
+
+Console> (enable) show boot
+
+BOOT variable = bootflash:cat4000.5-5-8.bin,1;
+
+CONFIG_FILE variable = bootflash:switch.cfg
+
+
+Configuration register is 0x102
+
+ignore-config:disabled
+
+auto-config:non-recurring
+
+console baud:9600
+
+boot:image specified by the boot system commands
+
+Console > (enable)
+
+
+Step 6 If the last line in the output of the show boot command is not boot:image specified by the boot system commands, use the set boot config-register command to set the boot configuration.
+
+This example shows how to set the boot configuration:
+
+Console > (enable) set boot config-register boot system
+
+Configuration register is 0x102
+
+ignore-config:disabled
+
+auto-config:non-recurring
+
+console baud:9600
+
+boot:image specified by the boot system commands
+
+Console > (enable)
+
+
+Step 7 Use the set boot system flash command to prepend the promupgrade image to the boot string.
+
+Note Make sure that you use the prepend keyword with the set boot system flash command. The switch always boots the first image in the boot string, and you want the promupgrade image to boot first.
+
+This example shows how to prepend the promupgrade image to the boot string:
+
+Console> (enable) set boot system flash bootflash:cat4000-promupgrade.6-1-5.bin prepend
+
+BOOT variable = bootflash:cat4000-promupgrade.6-1-5.bin,1;bootflash:cat4000.5-5-8.bin,1;
+
+
+Step 8 Reset the switch to boot the promupgrade program.
+Caution No intervention is necessary to complete the upgrade. Do not interrupt the boot process by performing a reset, power cycle, OIR of the supervisor engine, etc. for at least five minutes! If the process is not allowed to complete, you may damage the switch and have to return it to Cisco for repair.
+
+Upgrading the ROMMON may require up to five minutes because the switch boots the promupgrade image. This special program erases the current ROMMON from Flash memory and installs the new one. After installing the new ROMMON, the system resets again and boots the next image in the BOOT string. If the BOOT string was configured as described in Step 7, the next image is the software image that the switch was originally configured to boot.
+
+Note A Telnet session is disconnected when you reset the switch; you will lose connectivity to the switch for some time.
+
+If you are connected to the console serial port, output similar to the following is displayed after you reset the switch:
+
+0:00.530901:ig0:00:10:7b:aa:d3:fe is 172.20.59.203
+
+0:00.531660:netmask:255.255.255.0
+
+0:00.532030:broadcast:172.20.59.255
+
+0:00.532390:gateway:172.20.59.1
+
+WS-X4012 bootrom version 6.1(2), built on 2000.04.03 15:20:09
+
+H/W Revisions:Meteor:2 Comet:8 Board:1
+
+Supervisor MAC addresses:00:10:7b:aa:d0:00 through 00:10:7b:aa:d3:ff (1024 addresses)
+
+Installed memory:64 MB
+
+Testing LEDs.... done!
+
+The system will autoboot in 5 seconds.
+
+Type control-C to prevent autobooting.
+
+rommon 1 >
+
+The system will now begin autobooting.
+
+Autobooting image:
+
+"bootflash:cat4000-promupgrade.6-1-5.bin"
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC#############################
+
+Replacing ROM version 6.1(2) with version 6.1(5)
+
+
+Upgrading your PROM... DO NOT RESET the system
+
+unless instructed or it may NOT be bootable!!!
+
+Beginning erase of 524288 bytes at offset 0x0... Done!
+
+Beginning write of system prom (467456 bytes at offset 0x0)...
+
+This could take as little as 10 seconds or up to 2 minutes.
+
+Please DO NOT RESET!
+
+
+*******************************************
+
+
+Success!
+
+System will reset in 2 seconds...
+
+[ ... ]
+
+
+The switch reboots back into the online software:
+
+0:00.530856:ig0:00:10:7b:aa:d3:fe is 172.20.59.203
+
+0:00.531616:netmask:255.255.255.0
+
+0:00.531967:broadcast:172.20.59.255
+
+0:00.532342:gateway:172.20.59.1
+
+WS-X4012 bootrom version 6.1(5), built on 2000.04.08 15:20:09
+
+H/W Revisions:Meteor:2 Comet:8 Board:1
+
+Supervisor MAC addresses:00:10:7b:aa:d0:00 through 00:10:7b:aa:d3:ff (1024 addresses)
+
+Installed memory:64 MB
+
+Testing LEDs.... done!
+
+The system will autoboot in 5 seconds.
+
+Type control-C to prevent autobooting.
+
+rommon 1 >
+
+The system will now begin autobooting.
+
+Autobooting image:"bootflash:cat4000.5-5-8.bin"
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+CCCCCCCCCCCCCCCCCCC#####################################
+
+
+Step 9 In privileged mode on your switch, use the show version command to verify that the new ROMMON version is running on the switch.
+
+The ROMMON version number is listed as the System Bootstrap Version. For example, the following system is running ROMMON version 6.1(5):
+
+Console> (enable) show version
+
+WS-C4003 Software, Version NmpSW:5.5(8)
+
+Copyright (c) 1995-2001 by Cisco Systems, Inc.
+
+NMP S/W compiled on May 24 2001, 21:12:09
+
+GSP S/W compiled on May 24 2001, 18:39:50
+
+
+System Bootstrap Version:6.1(5)
+
+
+Hardware Version:1.0  Model:WS-C4003  Serial #:xxxxxxxxx
+
+
+.
+
+.
+
+.
+
+Console > (enable)
+
+
+Caution When entering the clear boot system flash cat.4000-promupgrade.6-1-5.bin command, be sure to type the correct promupgrade image in the command syntax. If you enter only clear boot system flash, all images in the autoboot string are cleared, and the switch will not know which image to boot.
+
+Step 10 Use the clear boot system flash promupgrade_image command to remove the promupgrade program from the autoboot string.
+
+This example shows how to remove the promupgrade image cat.4000-promupgrade.6-1-5.bin from the boot sequence. Notice that the response message shows the system image for software release 5.5(8) in the autoboot string.
+
+Console> (enable) clear boot system flash bootflash:cat4000-promupgrade.6-1-5.bin
+
+BOOT variable = bootflash:cat4000.5-5-8.bin,1;
+
+
+Step 11 Use the del command to delete the promupgrade program from the Flash memory and squeeze the Flash memory to reclaim unused space.
+
+This example shows how to delete the promupgrade image cat.4000-promupgrade.6-1-5.bin from the Flash memory and reclaim unused space.
+
+Console> (enable) del bootflash:cat4000-promupgrade.6-1-5.bin
+
+Console> (enable) squeeze bootflash:
+
+
+All deleted files will be removed, proceed (y/n) [n]? y
+
+
+Squeeze operation may take some time, proceed (y/n) [n]? y
+
+Console > (enable)
+
