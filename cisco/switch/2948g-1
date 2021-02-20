@@ -1,0 +1,7 @@
+Console> (enable) copy flash tft 
+Flash device [bootflash]? 
+Name of file to copy from [cat4000.6-3-5.bin]? 
+IP address or name of remote host [10.16.1.20]? 
+Name of file to copy to [cat4000.6-3-5.bin]? 
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC/
+File has been copied successfully.
