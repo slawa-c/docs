@@ -23,7 +23,7 @@ mdadm: No md superblock detected on /dev/sdc.
 ```
 
 ```
-# mdadm --create /dev/md0 --level=mirror --raid-devices=2 /ded/sd[bc]  
+# mdadm --create /dev/md0 --level=mirror --raid-devices=2 /dev/sd[bc]  
 ```
 ```
 mdadm: You haven't given enough devices (real or missing) to create this array
