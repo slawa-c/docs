@@ -1,6 +1,10 @@
 
 
 
+Добавляемая нода должна быть без виртуалок и/или host(DNS)
+
+
+
 
 delete cluster
 (https://pve.proxmox.com/pve-docs/pve-admin-guide.html#pvecm_separate_node_without_reinstall)
