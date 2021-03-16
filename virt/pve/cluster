@@ -1,0 +1,15 @@
+
+
+
+
+delete cluster
+(https://pve.proxmox.com/pve-docs/pve-admin-guide.html#pvecm_separate_node_without_reinstall)
+
+systemctl stop pve-cluster corosync
+pmxcfs -l
+rm /etc/corosync/*
+rm /etc/pve/corosync.conf
+killall pmxcfs
+systemctl start pve-cluster
+
+
