@@ -29,7 +29,10 @@ build
 
 +NODE
 plugin -> SSH Agent
-
+Lanch agents via SSH -> Host (Credentials)
+ > Manyally trusted key Verification Strategy
+ 
+ 
 
 
 
