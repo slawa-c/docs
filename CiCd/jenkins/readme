@@ -20,3 +20,6 @@ cat /var/lib/jenkins/secrets/initialAdminPassword
 Install suggested plugins
 
 
+plugins
+cd /var/lib/jenkins/plugins/
+
