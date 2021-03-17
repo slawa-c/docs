@@ -35,6 +35,41 @@ Lanch agents via SSH -> Host (Credentials)
  
 
 
+CLI
+java -jar jenkins-cli.jar -s http://x.x.x.x:8080/ -webSocket help
+
+java -jar jenkins-cli.jar -auth admin:password -s http://x.x.x.x:8080 who-am-i
+Authenticated as: admin
+Authorities:
+  authenticated
+
+User -> add token
+
+java -jar jenkins-cli.jar -auth admin:token -s http://x.x.x.x:8080 who-am-i
+Authenticated as: admin
+Authorities:
+  authenticated
+  
+  
+env
+export JENKINS_USER_ID=admin
+export JENKINS_API_TOKEN=12345
+
+java -jar jenkins-cli.jar -s http://x.x.x.x:8080 who-am-i
+Authenticated as: admin
+Authorities:
+  authenticated
+
+
+
+
+
+
+
+  
+
+
+
 
 
 
