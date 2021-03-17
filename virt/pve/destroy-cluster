@@ -1,0 +1,59 @@
+Destroy Cluster
+
+log
+tail -f /var/log/daemon.log 
+tail -f /var/log/syslog
+
+>>>
+ipcc_send_rec failed: Transport endpoint is not connected
+ipcc_send_rec failed: Connection refused
+
+
+Скрипт для пересборки кластера
+- не важно на какой ноде запускать, важно под root
+- ntp >>> chrony
+>>>>>>
+#!/bin/bash
+echo "######" Перезапуск локальных сервисов "######"
+service ntp restart
+service pvedaemon restart
+service pvestatd restart
+service pve-cluster restart
+service pve-manager restart
+service pveproxy restart
+
+echo "######" Начинаю перезапуск удалённых сервисов "######"
+for PVE in pve02 pve03 pve04 pve05 pve06
+do
+    echo "######" Перезапуск сервисов на $PVE "######"
+    ssh root@$PVE -t service ntp restart
+    ssh root@$PVE -t service pvedaemon restart
+    ssh root@$PVE -t service pvestatd restart
+    ssh root@$PVE -t service pve-cluster restart
+    ssh root@$PVE -t service pve-manager restart
+    ssh root@$PVE -t service pveproxy restart
+done
+
+
+
+
+ service ntp restart
+Failed to restart ntp.service: Unit ntp.service not found.
+
+ service pvedaemon restart
+ service pvestatd restart
+ service pve-cluster restart
+
+service pve-manager restart
+sh: 0: getcwd() failed: Transport endpoint is not connected
+Failed to restart pve-manager.service: Operation refused, unit pve-guests.service may be requested by dependency only (it is configured to refuse manual start/stop).
+See system logs and 'systemctl status pve-manager.service' for details.
+
+ service pveproxy restart
+sh: 0: getcwd() failed: Transport endpoint is not connected
+
+
+
+
+
+
