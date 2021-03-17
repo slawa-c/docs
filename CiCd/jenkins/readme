@@ -23,3 +23,15 @@ Install suggested plugins
 plugins
 cd /var/lib/jenkins/plugins/
 
+build
+/var/lib/jenkins/workspace/job1
+
+
++NODE
+plugin -> SSH Agent
+
+
+
+
+
+
