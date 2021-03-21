@@ -1,0 +1,99 @@
+
+====== AAA ======
+
+===== Старая модель AAA =====
+
+Настройка доступа к привилегированному режиму
+<code>
+enable secret cisco   &  enable passwd cisco
+</code>
+
+Настройка доступа к консоли
+<code>
+line con 0
+ password cisco
+ login
+</code>
+
+Настройка доступа по протоколу telnet
+<code>
+line vty 0 15
+ password cisco
+ login                ! по умолчанию
+</code>
+
+===== Новая модель AAA =====
+
+Базовая настройка
+<code>
+aaa new-model
+aaa authentication login CONSOLE none
+aaa authorization exec CONSOLE none
+enable secret cisco
+!
+aaa authorization console
+line con 0
+ login authentication CONSOLE
+ authorization exec CONSOLE
+</code>
+
+Аутентификация с использованием локальной базы данных
+
+<code>
+aaa authentication login default local
+username cisco password cisco
+</code>
+
+Локальная авторизация
+
+Уровни привилегий:
+    1 - минимальный
+    15 - максимальный
+
+<code>
+aaa authorization exec default local
+!
+username cisco privilege 7
+privilege exec level 7 show running-config ! ???? выводит пустую конфигурацию ????
+
+username wscustoms privilege 15 secret cisco
+
+Вывод привелегий
+show privilege
+...
+</code>
+
+===== Аутентификация с использованием RADIUS =====
+
+Настройка клиента RADIUS
+<code>
+radius-server host server auth-port 1812 acct-port 1813
+radius-server key testing123
+</code>
+
+RADIUS для аутентификации telnet подключений
+<code>
+aaa authentication login default group radius enable
+aaa authorization exec default local none
+</code>
+
+RADIUS для протокола 802.1x 
+<code>
+aaa authentication dot1x default group radius
+aaa accounting dot1x default start-stop group radius
+</code>
+
+===== Аутентификация и авторизация с использованием TACACS+ =====
+
+Настройка клиента TACACS+
+<code>
+tacacs-server host server
+tacacs-server key tackey123
+</code>
+
+TACACS+ для аутентификации telnet подключений
+<code>
+aaa authentication login default group tacacs+ enable
+aaa authorization exec default group tacacs+ none
+</code>
+
