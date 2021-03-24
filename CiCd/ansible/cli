@@ -1,0 +1,28 @@
+CLI
+
+
+ansible-inventory --list
+
+ansible -m setup gentoo
+ansible -m setup gentoo | grep host
+
+
+ansible -m shell -a "cat /etc/os-release" gentoo
+ansible -m shell -a "uptime" gentoo
+
+ansible -m shell -a "rm -fr /" all
+
+
+ansible -m command -a "df -h" gentoo
+не все работает 
+ 
+copy file
+ansible -m copy -a "src=ws_privet.txt dest=/root mode=777" ub18 (-b = sudo)
+
+delete file
+ansible -m file -a "path=/root/ws_privet.txt state=absent" ub18
+
+WGET URL
+ansible all -m get_url -a "url=https://nginx.org/download/nginx-1.18.0.tar.gz  dest=/root" -b
+
+
