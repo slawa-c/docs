@@ -11,6 +11,9 @@ yum install openssh-server
 chkconfig sshd on
 service sshd start
 
+gentoo
+sudo /etc/init.d/sshd start
+
 
 
 
