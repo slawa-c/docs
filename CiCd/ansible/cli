@@ -44,3 +44,37 @@ ansible-doc -l | grep win_
 
 
 
+
+YAML
+---
+- cmd1
+- cmd2
+
+- fruits:
+  - apple
+  - orange
+  - mango
+- vegetables:
+  - cerrots
+  - cucumber
+  
+- vasya:
+   nick: vasek
+   position: developer
+   skills: 
+      - python
+      - perl
+      - php
+- petro:
+    nick: "pettya: krutoi"
+        position: manger
+    skills:
+       - manager
+       - make_noise
+       
+       
+       
+ - kolya: { nick: kolyan, postion: admin. skills: ['killer', 'cleaner'] }
+ fruits [ 'apple', 'orange', 'mango']
+
+
