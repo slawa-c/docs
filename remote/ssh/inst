@@ -6,6 +6,14 @@ apt install -y openssh-server
 systemctl status ssh
 debian -->> sudo systemctl restart sshd
 
+centos
+yum install openssh-server
+chkconfig sshd on
+service sshd start
+
+
+
+
 #ADD USER (SUDO)
 
 $ adduser username
