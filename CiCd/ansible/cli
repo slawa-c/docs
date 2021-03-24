@@ -25,4 +25,22 @@ ansible -m file -a "path=/root/ws_privet.txt state=absent" ub18
 WGET URL
 ansible all -m get_url -a "url=https://nginx.org/download/nginx-1.18.0.tar.gz  dest=/root" -b
 
+ansible -m yum -a "name=stress state=installed" all
+ansible -m yum -a "name=stress state=removed" all
+ansible -m yum -a "name=nginx state=latest" -b ub18
+
+ansible -m yum -a "name=httpd state=latest" -b ub18
+ansible -m service -a "name=httpd state=started enabled=yes" -b ub18
+ansible -m yum -a "name=httpd state=removed" -b ub18
+
+проверка подключения к url
+ansible -m uri -a "url=http://www.adv-it.net" all
+ansible -m uri -a "url=http://www.adv-it.net return_content=yes" all
+ 
+MONITORING
+ansible -m shell -a "ls /var" -vvvvvv ub18
+
+ansible-doc -l | grep win_
+
+
 
