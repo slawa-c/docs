@@ -1,0 +1,56 @@
+COPY to SSH
+
+
+### скопировать файл на удаленную машину
+scp file user@host: /pathtowrite_file
+
+### можно использовать команду" cat " для создания удаленного файла.
+echo 'Some Text' | ssh user@host "cat > /remotefile.txt"
+короче
+ssh user@remotehost "echo Some Text > /remotefile.txt"
+
+### можно использовать dd добавить файл. 
+Возможно, немного неясно, но полезно, если перенаправление вывода на удаленном узле невозможно.
+cat ~/.ssh/id_rsa.pub | ssh user@host 'dd of=.ssh/authorized_keys oflag=append conv=notrunc'
+этот пример добавляет ваш публичный ключ в файл authorized_keys на удаленном хосте.
+
+### займет содержимое буфера обмена и добавит его в конец файла удаленно
+pbcopy < ~/.ssh/id_rsa.pub
+pbpaste | ssh user@host 'cat >> ~/.ssh/authorized_keys'
+
+### это позволяет записывать (добавлять) в конец файла на удаленном хосте:
+echo "Append string to file" | ssh root@host 'cat >> ~/.ssh/authorized_keys'
+
+
+### Если нужно использовать несколько раз, может быть проще использовать этот код. 
+С помощью инструмента" sshpass " ssh не будет запрашивать пароль для каждого вызова скрипта. 
+(если вам не нужно держать это в секрете, то лучше не использовать его)
+
+для получения дополнительной информации о sshpass : https://stackoverflow.com/questions/12202587/automatically-enter-ssh-password-with-script
+
+#!/bin/bash
+
+SCRIPT="echo 'nameserver 8.8.8.8' > /etc/resolv.conf"        
+
+if [ "$#" -ne 1 ]; then
+        echo "Wrong number of arguments. usage: prog dest_machine"
+else
+        sshpass -p "root" ssh -o StrictHostKeyChecking=no root@"" "${SCRIPT}"
+fi
+
+----
+
+создать скрипт, как показано ниже:
+
+# !/bin/bash
+
+read -p "Enter target server IP : " server
+echo "Enter root password for $server : " ; read -s password
+
+yum install sshpass -y
+
+sshpass -p "$password" ssh -o strictHostKeyChecking=no root@$server echo "your text goes here" >> /remotefile.txt
+
+
+
+
