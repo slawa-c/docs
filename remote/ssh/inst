@@ -28,16 +28,63 @@ $ adduser username sudo
 $ vim /etc/ssh/sshd_config
   PermitRootLogin no
 $ .... restart sshd
-#GENERATION KEY
 
-$ sudo ssh-keygen (root)
-$ ssh-keygen (username)
-$ ssh-keygen -b 4096 (4096-bit RSA, default 2048)
+
+#--- GENERATION KEY ---
+
+ssh-keygen -t ed25519 -C "your_email@example.com"
+
+Note: If you are using a legacy system that doesn't support the Ed25519 algorithm, use:
+$ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+>>
+Generating public/private rsa key pair.
+>>
+Enter file in which to save the key (/Users/your_user/.ssh/id_rsa): Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /Users/your_user/.ssh/id_rsa.
+Your public key has been saved in /Users/your_user/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:XXXXXxxxxxXXXXXxxxxxXXXX... your_email@example.com
+The key's randomart image is:
++---[RSA 4096]----+
+|          .   . .|
+|     .   . o .E+ |
+|    o = o . o+  o|
+|     * o . oo.=.o|
+|      o S . .Bo+.|
+|       + o  = B. |
+|       .B  . B   |
+|       =+.= +    |
+|      .+=+ =.o   |
++----[SHA256]-----+
+
+
+eval "$(ssh-agent -s)"
+vim ~/.ssh/config
+>>
+Host *
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_rsa
+
+ssh-add -K ~/.ssh/id_rsa
+
+
+---------------
+ssh-keygen -t rsa
+ssh-keygen -t rsa username
+ssh-keygen -b 4096 (4096-bit RSA, default 2048)
 Generating public/private rsa key pair.
 Enter file in which to save the key (/home/username/.ssh/id_rsa):
 
 Enter passphrase (empty for no passphrase):
-#COPY KEY REMOTE (id_rsa.pub --->>> authorized_keys remote host)
+
+#COPY KEY REMOTE 
+brew install ssh-copy-id
+ssh-copy-id -i ~/.ssh/id_rsa.pub username@host
+
+
+(id_rsa.pub --->>> authorized_keys remote host)
 
 $ su - username
 $ mkdir -p ~/.ssh or /home/username/.ssh and touch /home/username/.ssh/authorized_keys
