@@ -1,6 +1,6 @@
 How to Install / Enable OpenSSH on CentOS 7
 
-sudo yum –y install openssh-server openssh-clients
+yum -y install openssh-server openssh-clients
 
 systemctl start sshd
 systemctl status sshd
