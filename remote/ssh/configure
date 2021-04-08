@@ -1,0 +1,31 @@
+# --- SSH ---
+
+# --- CONFIGURE ---
+
+vim /etc/ssh/sshd_config
+
+
+
+
+
+
+>>> 
+
+To disable root logins, edit or add as follows:
+PermitRootLogin no
+
+Restrict login to user tom and jerry only over ssh:
+AllowUsers user1 user2
+
+Change ssh port i.e. run it on a non-standard port like 1235
+Port 12356
+
+
+
+
+# --- ADD USER (SUDO) ---
+
+$ adduser username
+...
+$ adduser username sudo
+...
