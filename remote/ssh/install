@@ -1,17 +1,31 @@
 #SSH
 
-#INSTALL
+# --- INSTALL ---
 
 apt install -y openssh-server
 systemctl status ssh
 debian -->> sudo systemctl restart sshd
 
-centos
-yum install openssh-server
+# --- CentOS ---
+yum -y install openssh-server openssh-clients
+## ---- CentOS 6.x and order
 chkconfig sshd on
-service sshd start
+service sshd start # Start the service
+netstat -tulpn | grep :22 # Make sure port 22 is opened
+vim etc/sysconfig/iptables # Firewall Settings 
+-A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
+-A RH-Firewall-1-INPUT -s 192.168.1.0/24 -m state --state NEW -p tcp --dport 22 -j ACCEPT
+-A RH-Firewall-1-INPUT -m tcp -p tcp --dport 22 -j ACCEPT
+service iptables restart
+## ---- CentOS 7.x and 8.x
+systemctl enable sshd.service
+systemctl start sshd.service
+ss -tulpn | grep ':22' 
+firewall-cmd --zone=public --add-service=ssh --permanent
+firewall-cmd --reload
 
-gentoo
+
+# --- gentoo ---
 sudo /etc/init.d/sshd start
 
 
@@ -23,6 +37,7 @@ $ adduser username
 ...
 $ adduser username sudo
 ...
+
 #CONFIGURE SSHD
 
 $ vim /etc/ssh/sshd_config
