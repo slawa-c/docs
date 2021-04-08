@@ -10,4 +10,8 @@ brew install terraform
 
 
 ## --- LINUX ---
+wget ...
+unzip ...
+mv terraform /bin/
+
 
