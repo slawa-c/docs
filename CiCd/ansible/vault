@@ -1,0 +1,310 @@
+Ansible: использование Vault — зашифрованного хранилища
+
+Начиная с версии 1.5 в Ansible была доабвлена возможность хранения секретных данных, таких как пароли или RSA ключи, в зашифрованных файлах — vault («хранилище»).
+
+Для работы с такими хранилищами используется утилита ansible-vault, которая принимает два основных аргумента — 
+--ask-vault-pass или --vault-password-file, которые могут быть заданы через ansible.cfg.
+
+Располагается в /usr/bin/ansible-vault и представялет собой Python-скрипт.
+
+Содержание
+
+    Шифрование файлов
+    Расшифровка файлов
+    Редактирование файлов
+    Просмотр файла
+    Смена пароля
+    Примеры
+        Пример использования зашифрованного файла
+        Пример шифрования переменной
+        vault-id
+    Ссылки по теме
+
+Шифрование файлов
+
+Для создания хранилища — используется create:
+ansible-vault create file.yml
+New Vault password:
+Confirm New Vault password:
+
+Результат:
+cat file.yml
+ANSIBLE_VAULT;1.1;AES256
+32333262313562656230663934383566373966633138346137313937306230373633333730343839
+
+Что бы зашифровать уже имеющий файл — используется encrypt:
+echo "data" > raw_file.txt
+ansible-vault encrypt raw_file.txt
+New Vault password:
+Confirm New Vault password:
+Encryption successful
+cat raw_file.txt
+ANSIBLE_VAULT;1.1;AES256
+65303737323263313938656134323635313039363131626331643835393034323335343432383438
+
+
+# --- Расшифровка файлов ---
+
+Что бы зашифрованный файл снова вернуть в plaintext — используем decrypt:
+ansible-vault decrypt file.yml
+Vault password:
+Decryption successful
+cat file.yml
+test data
+
+   
+# --- Редактирование файлов ---
+
+Используется ansible-vault edit:
+ansible-vault edit file.yml
+Vault password:
+
+Файл расшифровывается во временный файл, открывается для редактирования, 
+после завершения — снова шифруется и сохраняется в старом месте:
+
+# --- Просмотр файла ---
+
+Что бы просто просмотреть содержимое хранилища — используем view.
+ansible-vault view file.yml
+Vault password:
+test data
+
+
+# --- Смена пароля ---
+
+Для смены пароля используется rekey, который можно применять к нескольким файлам сразу, если они зашифрованы одним ключём (паролем).
+И меняем пароль для обоих файлов:
+ansible-vault rekey file.yml file2.yml
+Vault password:
+New Vault password:
+Confirm New Vault password:
+Rekey successful
+
+
+
+# --- Шифрования файла паролем записанным в файле
+
+Создаем файл который будем шифровать vim text.yml 
+Создаём файл с паролем: echo «MySuperPass» > ~/.ansible_pass.txt
+Шифруем файл text.yml: ansible-vault encrypt test.yml ---vault-password-file ~/.ansible_pass.txt
+Расшифруем файл text.yml: ansible-vault encrypt test.yml ---vault-password-file ~/.ansible_pass.txt
+
+# --- Запускаем зашифрованный файл через файл с записаным паролем ---
+ansible-playbook -i "localhost," -c local helloworld.yml --vault-password-file ~/.ansible_pass.txt
+
+# --- Пример шифрования переменной ---
+
+— можно зашифровать строку, например:
+
+ansible-vault encrypt_string
+New Vault password:
+Confirm New Vault password:
+Reading plaintext input from stdin. (ctrl-d to end input)
+This is Text String
+!vault |
+ANSIBLE_VAULT;1.1;AES256
+38363965343563353962666264646337613464663263663632626264373563633430323633356639
+3737333233393662336533376661333163653035333334370a373565343330633537363563656430
+37363632636664353864353532633030326231356238643634623033396539656164666437343565
+3964653033343136620a356438316635663561313665323739353766383233656261646538616165
+66313237633635646265653633323635333861636539313937343363666539366465
+Encryption successful
+
+Либо выполнить одной командой:
+ansible-vault encrypt_string "This is Text String" --name "encrypted_data_string" --vault-password-file ~/.ansible_pass.txt
+encrypted_data_string: !vault |
+ANSIBLE_VAULT;1.1;AES256
+36653162656434373362396464353061343337343866323436366138636266666165636163623337
+3339343833383064303036346661616235396563356362630a363430313566323537363964663636
+32303931333561633632323265346136323139616536343466663736666138333638306133653935
+3066643730653831300a663735333639343064666636336139336536353734343963313032373338
+35643639643136623163346662623763633763366462396433323133306532663038
+Encryption successful
+
+--name "encrypted_data_string"       >>> name vars
+encrypt_string "This is Text String" >>> name string
+
+
+Далее эта строка может использоваться в переменной.
+
+Добавим новый файл vars/strings.yml с переменной encrypted_data_string:
+---
+encrypted_data_string: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          36653162656434373362396464353061343337343866323436366138636266666165636163623337
+          3339343833383064303036346661616235396563356362630a363430313566323537363964663636
+          32303931333561633632323265346136323139616536343466663736666138333638306133653935
+          3066643730653831300a663735333639343064666636336139336536353734343963313032373338
+          35643639643136623163346662623763633763366462396433323133306532663038
+
+Обновим плейбук:
+---
+- hosts: all
+  tasks:
+    - debug:
+        msg: "hello world"
+    - name: add vars
+      include_vars:
+        file: exmple_text.yml
+    - name: add another vars
+      include_vars:
+        file: strings.yml
+    - name: Add decrypted text from exmple_text.yml
+      copy:
+        content="{{ data_text }}"
+        dest=/tmp/example_text_out.txt
+    - name: Add another decrypted text from strings.yml
+      copy:
+        content="{{ encrypted_data_string }}"
+        dest=/tmp/another_example_text_out.txt
+
+Запускаем выполнение:
+ansible-playbook -i "localhost," -c local helloworld.yml --vault-password-file ~/.ansible_pass.txt
+PLAY [all] ****
+TASK [Gathering Facts] ****
+ok: [localhost]
+TASK [debug] ****
+ok: [localhost] => {
+"msg": "hello world"
+}
+TASK [add vars] ****
+ok: [localhost]
+TASK [add another vars] ****
+ok: [localhost]
+TASK [Add decrypted text from exmple_text.yml] ****
+ok: [localhost]
+TASK [Add another decrypted text from strings.yml] ****
+changed: [localhost]
+PLAY RECAP ****
+localhost                  : ok=6    changed=1    unreachable=0    failed=0
+
+    Re-playCopy to ClipboardPauseFull View
+
+Проверяем:
+cat /tmp/another_example_text_out.txt
+This is Text String
+
+    Re-playCopy to ClipboardPauseFull View
+
+Или используя --ask-vault-pass:
+ansible-playbook -i «localhost,» -c local helloworld.yml ---ask-vault-pass
+Vault password:
+…
+
+    Re-playCopy to ClipboardPauseFull View
+
+vault-id
+
+В Ansible 2.4 и выше вместо --ask-vault-pass и --vault-password-file можно использовать --vault-id, который позволяет использовать разные пароли для разных файлов.
+
+Создадим новые файлы вместо exmple_text.yml и strings.yml, зашифруем их разными паролями.
+
+Файлы паролей:
+echo "pass1" > pass1.txt
+echo "pass2" > pass2.txt
+
+    Re-playCopy to ClipboardPauseFull View
+
+Создаём файл vars/data_text1.yml с переменной data_text1:
+echo «data_text1: Data Text One» > vars/data_text1.yml
+
+    Re-playCopy to ClipboardPauseFull View
+
+Шифруем его паролем из файла pass1.txt:
+ansible-vault ---vault-id pass1.txt encrypt vars/data_text1.yml
+Encryption successful
+
+    Re-playCopy to ClipboardPauseFull View
+
+Аналогично — второй файл:
+echo «data_text2: Data Text Two» > vars/data_text2.yml
+
+    Re-playCopy to ClipboardPauseFull View
+
+И тоже шифруем его, вторым паролем:
+ansible-vault ---vault-id pass2.txt encrypt vars/data_text2.yml
+Encryption successful
+
+    Re-playCopy to ClipboardPauseFull View
+
+Обновим плейбук:
+---
+- hosts: all
+  tasks:
+    - debug:
+        msg: "hello world"
+    - name: add data_text1.yml 
+      include_vars:
+        file: data_text1.yml 
+    - name: add data_text2.yml 
+      include_vars:
+        file: data_text2.yml 
+    - name: Add decrypted data_text1
+      copy:
+        content="{{ data_text1 }}"
+        dest=/tmp/data_text1_out.txt
+    - name: Add decrypted data_text2
+      copy:
+        content="{{ data_text2 }}"
+        dest=/tmp/data_text2_out.txt
+
+И запускаем его:
+ansible-playbook -i "localhost," -c local --vault-id pass1.txt --vault-id pass2.txt helloworld.yml
+PLAY [all] ****
+TASK [Gathering Facts] ****
+ok: [localhost]
+TASK [debug] ****
+ok: [localhost] => {
+"msg": "hello world"
+}
+TASK [add data_text1.yml] ****
+ok: [localhost]
+TASK [add data_text2.yml] ****
+ok: [localhost]
+TASK [Add decrypted data_text1] ****
+changed: [localhost]
+TASK [Add decrypted data_text2] ****
+changed: [localhost]
+PLAY RECAP ****
+localhost                  : ok=6    changed=2    unreachable=0    failed=0
+
+    Re-playCopy to ClipboardPauseFull View
+
+Проверяем:
+cat /tmp/data_text*
+Data Text OneData Text Two
+
+    Re-playCopy to ClipboardPauseFull View
+
+Так же --vault-id можно использовать вместе с --vault-password-file:
+rm /tmp/data_text*
+ansible-playbook -i "localhost," -c local --vault-id pass1.txt --vault-password-file pass2.txt helloworld.yml
+...
+localhost                  : ok=6    changed=2    unreachable=0    failed=0
+
+    Re-playCopy to ClipboardPauseFull View
+
+Либо использовать --ask-vault-pass вместо указания файла:
+rm /tmp/data_text*
+ansible-playbook -i "localhost," -c local --vault-id pass1.txt --ask-vault-pass helloworld.yml
+Vault password:
+...
+localhost                  : ok=6    changed=2    unreachable=0    failed=0
+
+    Re-playCopy to ClipboardPauseFull View
+
+Сам --vault-password-file тоже можно использовать несколько раз:
+ansible-playbook -i "localhost," -c local --vault-password-file pass1.txt --vault-password-file pass2.txt helloworld.yml
+
+    Re-playCopy to ClipboardPauseFull View
+
+Ansible попробует каждый из переданных паролей, пока один из них не сработает для зашированного файла.
+Ссылки по теме
+
+Ansible Vault
+
+2.4 support for multiple vault passwords, looking for feedback
+
+How Ansible Vault Works
+
+Working with ansible-vault
