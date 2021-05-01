@@ -21,7 +21,8 @@ pip3 install ansible
 >>>> update-alternatives --install /usr/bin/py
 
 ### MacOS ###
-
+>> check installed version
+ls -l /Library/Developer/CommandLineTools/SDKs
 xcode-select --install
 
 >>brew
